@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "VaKon2D.h"
+#include "Terraria.h"
 
 #include "GladWrapper.h"
 #include "Image.h"
@@ -45,7 +45,7 @@
 
 #include <iostream>
 
-void VaKon2D::start()
+void Terraria::start()
 {
 	Initer::init({.glfwVersion = {3, 3}, .windowSize = {800, 600}, .title = "My game"});
 
