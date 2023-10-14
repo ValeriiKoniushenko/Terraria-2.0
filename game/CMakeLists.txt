@@ -27,6 +27,7 @@ target_link_libraries(
 	freetype
 	FreeType-Wrapper
 	Animations
+	Camera
 )
 
  add_custom_command(TARGET Terraria PRE_BUILD

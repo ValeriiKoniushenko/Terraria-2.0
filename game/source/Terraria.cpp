@@ -42,6 +42,7 @@
 #include "StopMotionAnimation.h"
 #include "TextBox.h"
 #include "UtilsFunctions.h"
+#include "Camera.h"
 
 #include <iostream>
 
@@ -49,35 +50,29 @@ void Terraria::start()
 {
 	Initer::init({.glfwVersion = {3, 3}, .windowSize = {800, 600}, .title = "My game"});
 
-	GetWindow().viewport(0, 0, 800, 600);
+	Camera camera;
+	camera.setSize({800, 600});
 
 	ShaderPack shaderPack;
 	shaderPack.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");
 	shaderPack.loadShaders("widget", "assets/shaders/widget.vert", "assets/shaders/widget.frag");
 
 	Texture texture(Gl::Texture::Target::Texture2D, true, true);
-	Image image("assets/textures/clock.png");
-	image.setInternalChannel(Gl::Texture::Channel::SRGBA);
+	Image image("assets/textures/block/stone.png");
+	image.setInternalChannel(Gl::Texture::Channel::RGBA);
 	texture.setImage(image);
 	texture.setMagAndMinFilter(Gl::Texture::MagFilter::Linear, Gl::Texture::MinFilter::LinearMipmapLinear);
 
 	Widget widget;
 	widget.setTexture(texture);
-	widget.setSize({32, 32});
-	widget.move({100, 100});
-
-	StopMotionAnimation animation;
-	animation.setupAnimation({{0, 0}, {32, 32}}, {{544, 0}, {32, 32}}, widget);
-	animation.setFrameGap(100);
-	animation.setMode(IAnimation::Mode::Repeating);
-	animation.start();
+	widget.calculateFitTextureSize();
 
 	while (!GetWindow().shouldClose())
 	{
 		GetWindow().clearColor({0.2f, 0.3f, 0.3f});
 		GetWindow().clear(GL_COLOR_BUFFER_BIT);
 
-		animation.draw(shaderPack);
+		widget.draw(shaderPack);
 
 		GetUpdateableCollector().updateAll();
 		GetWorld().update();
