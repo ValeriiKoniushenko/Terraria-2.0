@@ -43,12 +43,15 @@
 #include "TextBox.h"
 #include "UtilsFunctions.h"
 #include "Camera.h"
+#include "TextureManager.h"
 
 #include <iostream>
 
 void Terraria::start()
 {
 	Initer::init({.glfwVersion = {3, 3}, .windowSize = {800, 600}, .title = "My game"});
+
+	GetTextureManager().loadAllTextures();
 
 	Camera camera;
 	camera.setSize({800, 600});
@@ -57,14 +60,8 @@ void Terraria::start()
 	shaderPack.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");
 	shaderPack.loadShaders("widget", "assets/shaders/widget.vert", "assets/shaders/widget.frag");
 
-	Texture texture(Gl::Texture::Target::Texture2D, true, true);
-	Image image("assets/textures/block/stone.png");
-	image.setInternalChannel(Gl::Texture::Channel::RGBA);
-	texture.setImage(image);
-	texture.setMagAndMinFilter(Gl::Texture::MagFilter::Linear, Gl::Texture::MinFilter::LinearMipmapLinear);
-
 	Widget widget;
-	widget.setTexture(texture);
+	widget.setTexture(GetTextureManager()["stone"]);
 	widget.calculateFitTextureSize();
 
 	while (!GetWindow().shouldClose())
