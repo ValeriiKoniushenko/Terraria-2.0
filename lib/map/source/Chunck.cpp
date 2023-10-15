@@ -25,31 +25,36 @@
 #include "ShaderPack.h"
 #include "TextureManager.h"
 
-void Chunck::draw(ShaderPack& shaderPack)
+void Chunck::draw(ShaderPack& shaderPack, Camera* camera/* = nullptr*/)
 {
 	for(auto& row : blocks_)
 	{
 		for (auto& block : row)
 		{
-			block.draw(shaderPack);
+			block.draw(shaderPack, camera);
 		}
 	}
 }
 
-void Chunck::generate()
+void Chunck::generate(long long xOffset, long long yOffset)
 {
 	std::size_t i = 0;
 	std::size_t j = 0;
-	blocks_.resize(chuckSize);
+	blocks_.resize(chunckSize);
+
 
 	for(auto& row : blocks_)
 	{
-		row.resize(chuckSize);
+		row.resize(chunckSize);
 		i = 0;
 		for (auto& block : row)
 		{
-			auto& texture = GetTextureManager()["stone"];
-			block.setPosition({i++ * texture.getImage()->getSize().x, j * texture.getImage()->getSize().y});
+			auto& texture = GetTextureManager()["air"];
+			auto size = texture.getImage()->getSize();
+			const glm::vec2 chunckSizePx = {chunckSize * size.x, chunckSize * size.y};
+			const glm::vec2 offset = {xOffset * chunckSizePx.x, yOffset * chunckSizePx.y};
+
+			block.setPosition({offset.x + i++ * size.x, offset.y + j * size.y});
 			block.setTexture(texture);
 		}
 		++j;

@@ -44,7 +44,7 @@ public:
 	void setHealth(float health);
 	[[nodiscard]] float getHealth() const;
 
-	void draw(ShaderPack& shaderPack);
+	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
 
 private:
 	float health_ = 0;

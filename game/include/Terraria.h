@@ -25,6 +25,7 @@
 #include "Camera.h"
 #include "InputAction.h"
 #include "NotCopyableAndNotMovable.h"
+#include "ShaderPack.h"
 
 class Terraria : public Utils::NotCopyableAndNotMovable
 {
@@ -40,4 +41,5 @@ private:
 	KeyboardInputAction cameraZoomUpIA;
 	KeyboardInputAction cameraZoomDownIA;
 	Camera camera;
+	ShaderPack shaderPack;
 };

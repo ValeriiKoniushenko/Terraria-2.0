@@ -89,28 +89,29 @@ Terraria::Terraria() :
 			camera.zoom(0.01f);
 		});
 
-}
-void Terraria::start()
-{
-	Initer::init({.glfwVersion = {3, 3}, .windowSize = {3440, 1440}, .title = "My game"});
+	Initer::init({.glfwVersion = {3, 3}, .windowSize = {1366, 768}, .title = "My game"});
 
-	GetTextureManager().loadAllTextures();
-
-	camera.setSize({3440, 1440});
-
-	ShaderPack shaderPack;
 	shaderPack.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");
 	shaderPack.loadShaders("widget", "assets/shaders/widget.vert", "assets/shaders/widget.frag");
 
-	Chunck chunck;
-	chunck.generate();
+	GetTextureManager().loadAllTextures();
+
+	camera.setSize({1366, 768});
+}
+void Terraria::start()
+{
+	Chunck chunck1;
+	chunck1.generate(0,0);
+	Chunck chunck2;
+	chunck2.generate(1,0);
 
 	while (!GetWindow().shouldClose())
 	{
 		GetWindow().clearColor({0.2f, 0.3f, 0.3f});
 		GetWindow().clear(GL_COLOR_BUFFER_BIT);
 
-		chunck.draw(shaderPack);
+		chunck1.draw(shaderPack, &camera);
+		chunck2.draw(shaderPack, &camera);
 
 		GetUpdateableCollector().updateAll();
 		GetWorld().update();

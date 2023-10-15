@@ -24,6 +24,7 @@
 
 #include "Texture.h"
 #include "ShaderPack.h"
+#include "Camera.h"
 
 Block::Block(Block&& other) noexcept
 {
@@ -53,7 +54,7 @@ void Block::setPosition(glm::vec2 position)
 void Block::setTexture(Texture& texture)
 {
 	widget_.setTexture(texture);
-	widget_.calculateFitTextureSize();
+	//widget_.calculateFitTextureSize();
 }
 
 [[nodiscard]] const Texture& Block::getTexture() const
@@ -76,7 +77,7 @@ void Block::setHealth(float health)
 	return health_;
 }
 
-void Block::draw(ShaderPack& shaderPack)
+void Block::draw(ShaderPack& shaderPack, Camera* camera/* = nullptr*/)
 {
-	widget_.draw(shaderPack);
+	widget_.draw(shaderPack, camera);
 }
