@@ -20,17 +20,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "Chunck.h"
 
-#include "NotCopyableAndNotMovable.h"
+#include "ShaderPack.h"
+#include "TextureManager.h"
 
-#include <vector>
-
-class Map : public Utils::NotCopyableAndNotMovable
+void Chunck::draw(ShaderPack& shaderPack)
 {
-public:
-	using MapT = std::vector<std::vector<ChunckT>>;
+	for(auto& row : blocks_)
+	{
+		for (auto& block : row)
+		{
+			block.draw(shaderPack);
+		}
+	}
+}
 
-private:
-	MapT map;
-};
+void Chunck::generate()
+{
+	std::size_t i = 0;
+	std::size_t j = 0;
+	blocks_.resize(chuckSize);
+
+	for(auto& row : blocks_)
+	{
+		row.resize(chuckSize);
+		i = 0;
+		for (auto& block : row)
+		{
+			auto& texture = GetTextureManager()["stone"];
+			block.setPosition({i++ * texture.getImage()->getSize().x, j * texture.getImage()->getSize().y});
+			block.setTexture(texture);
+		}
+		++j;
+	}
+}

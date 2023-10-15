@@ -29,6 +29,7 @@ target_link_libraries(
 	Animations
 	Camera
 	Texture-Manager
+	Map
 )
 
  add_custom_command(TARGET Terraria PRE_BUILD

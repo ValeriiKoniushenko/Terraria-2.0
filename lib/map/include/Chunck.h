@@ -22,15 +22,23 @@
 
 #pragma once
 
-#include "NotCopyableAndNotMovable.h"
+#include "NotCopyableButMovable.h"
+#include "Block.h"
 
 #include <vector>
+#include <memory>
 
-class Map : public Utils::NotCopyableAndNotMovable
+class ShaderPack;
+
+class Chunck : public Utils::NotCopyableButMovable
 {
 public:
-	using MapT = std::vector<std::vector<ChunckT>>;
+	using Container = std::vector<std::vector<Block>>;
+	inline static constexpr std::size_t chuckSize = 16;
+
+	void draw(ShaderPack& shaderPack);
+	void generate();
 
 private:
-	MapT map;
+	Container blocks_;
 };

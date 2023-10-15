@@ -44,6 +44,7 @@
 #include "UtilsFunctions.h"
 #include "Camera.h"
 #include "TextureManager.h"
+#include "Chunck.h"
 
 #include <iostream>
 
@@ -60,16 +61,15 @@ void Terraria::start()
 	shaderPack.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");
 	shaderPack.loadShaders("widget", "assets/shaders/widget.vert", "assets/shaders/widget.frag");
 
-	Widget widget;
-	widget.setTexture(GetTextureManager()["stone"]);
-	widget.calculateFitTextureSize();
-	int i =sizeof(widget);
+	Chunck chunck;
+	chunck.generate();
+
 	while (!GetWindow().shouldClose())
 	{
 		GetWindow().clearColor({0.2f, 0.3f, 0.3f});
 		GetWindow().clear(GL_COLOR_BUFFER_BIT);
 
-		widget.draw(shaderPack);
+		chunck.draw(shaderPack);
 
 		GetUpdateableCollector().updateAll();
 		GetWorld().update();

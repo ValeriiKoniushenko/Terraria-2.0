@@ -25,9 +25,12 @@
 #include "NotCopyableButMovable.h"
 #include "Widget.h"
 
+class ShaderPack;
+
 class Block : public Utils::NotCopyableButMovable
 {
 public:
+	Block() = default;
 	Block(Block&& other) noexcept;
 	Block& operator=(Block&& other) noexcept;
 
@@ -40,6 +43,8 @@ public:
 
 	void setHealth(float health);
 	[[nodiscard]] float getHealth() const;
+
+	void draw(ShaderPack& shaderPack);
 
 private:
 	float health_ = 0;

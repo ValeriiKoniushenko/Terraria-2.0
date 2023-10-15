@@ -23,6 +23,7 @@
 #include "Block.h"
 
 #include "Texture.h"
+#include "ShaderPack.h"
 
 Block::Block(Block&& other) noexcept
 {
@@ -72,4 +73,9 @@ void Block::setHealth(float health)
 [[nodiscard]] float Block::getHealth() const
 {
 	return health_;
+}
+
+void Block::draw(ShaderPack& shaderPack)
+{
+	widget_.draw(shaderPack);
 }
