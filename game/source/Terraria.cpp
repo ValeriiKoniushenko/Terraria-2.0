@@ -63,7 +63,7 @@ void Terraria::start()
 	Widget widget;
 	widget.setTexture(GetTextureManager()["stone"]);
 	widget.calculateFitTextureSize();
-
+	int i =sizeof(widget);
 	while (!GetWindow().shouldClose())
 	{
 		GetWindow().clearColor({0.2f, 0.3f, 0.3f});

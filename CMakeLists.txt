@@ -11,4 +11,5 @@ set(DEPENDENCIES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${DEPENDENCIES_DIR_NAME})
 add_subdirectory(VaKon2D)
 add_subdirectory(game)
 
+add_subdirectory(lib/map)
 add_subdirectory(lib/texture-manager)
