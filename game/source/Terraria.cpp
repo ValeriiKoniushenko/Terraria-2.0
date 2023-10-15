@@ -24,8 +24,6 @@
 
 #include "GladWrapper.h"
 #include "Image.h"
-#include "InputAction.h"
-#include "Keyboard.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "UpdateableCollector.h"
@@ -42,20 +40,63 @@
 #include "StopMotionAnimation.h"
 #include "TextBox.h"
 #include "UtilsFunctions.h"
-#include "Camera.h"
 #include "TextureManager.h"
 #include "Chunck.h"
 
 #include <iostream>
 
+Terraria::Terraria() :
+	cameraRightIA("Camera to right", Keyboard::Key::D)
+	, cameraLeftIA("Camera to left", Keyboard::Key::A)
+	, cameraTopIA("Camera to top", Keyboard::Key::W)
+	, cameraBottomIA("Camera to bottom", Keyboard::Key::S)
+	, cameraZoomUpIA("Camera zoom up", Keyboard::Key::PgUp)
+	, cameraZoomDownIA("Camera zoom down", Keyboard::Key::PgDown)
+{
+	cameraRightIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraRightIA.setIsRepeatable(true);
+	cameraRightIA.onAction.subscribe([this](){
+			camera.move({10,0});
+		});
+
+	cameraLeftIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraLeftIA.setIsRepeatable(true);
+	cameraLeftIA.onAction.subscribe([this](){
+			camera.move({-10,0});
+		});
+
+	cameraTopIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraTopIA.setIsRepeatable(true);
+	cameraTopIA.onAction.subscribe([this](){
+			camera.move({0,-10});
+		});
+
+	cameraBottomIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraBottomIA.setIsRepeatable(true);
+	cameraBottomIA.onAction.subscribe([this](){
+			camera.move({0,10});
+		});
+
+	cameraZoomUpIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraZoomUpIA.setIsRepeatable(true);
+	cameraZoomUpIA.onAction.subscribe([this](){
+			camera.zoom(-0.01f);
+		});
+
+	cameraZoomDownIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraZoomDownIA.setIsRepeatable(true);
+	cameraZoomDownIA.onAction.subscribe([this](){
+			camera.zoom(0.01f);
+		});
+
+}
 void Terraria::start()
 {
-	Initer::init({.glfwVersion = {3, 3}, .windowSize = {800, 600}, .title = "My game"});
+	Initer::init({.glfwVersion = {3, 3}, .windowSize = {3440, 1440}, .title = "My game"});
 
 	GetTextureManager().loadAllTextures();
 
-	Camera camera;
-	camera.setSize({800, 600});
+	camera.setSize({3440, 1440});
 
 	ShaderPack shaderPack;
 	shaderPack.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");

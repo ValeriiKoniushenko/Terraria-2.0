@@ -23,13 +23,14 @@
 #pragma once
 
 #include "NotCopyableAndNotMovable.h"
+#include "Chunck.h"
 
 #include <vector>
 
 class Map : public Utils::NotCopyableAndNotMovable
 {
 public:
-	using MapT = std::vector<std::vector<ChunckT>>;
+	using MapT = std::vector<std::vector<Chunck>>;
 
 private:
 	MapT map;

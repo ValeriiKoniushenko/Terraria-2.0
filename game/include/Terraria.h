@@ -22,10 +22,22 @@
 
 #pragma once
 
+#include "Camera.h"
+#include "InputAction.h"
 #include "NotCopyableAndNotMovable.h"
 
 class Terraria : public Utils::NotCopyableAndNotMovable
 {
 public:
+	Terraria();
 	void start();
+
+private:
+	KeyboardInputAction cameraRightIA;
+	KeyboardInputAction cameraLeftIA;
+	KeyboardInputAction cameraTopIA;
+	KeyboardInputAction cameraBottomIA;
+	KeyboardInputAction cameraZoomUpIA;
+	KeyboardInputAction cameraZoomDownIA;
+	Camera camera;
 };
