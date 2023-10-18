@@ -25,16 +25,35 @@
 #include "BaseGameMode.h"
 
 #include <cstdlib>
+#include <unordered_map>
+#include <string>
 
 class TerrariaGameMode : public BaseGameMode
 {
 public:
 	struct GenerationRules
 	{
-		int chunckSize = 12;
-		int chunckSmoothness = 5;
-		int dirtHeight = 5;
+		int chunckSize = 16;
+		int chunckSmoothness = 3;
+		int dirtHeight = 10;
+
+		struct Ore
+		{
+			int density = 10; // less value - more ore
+			int minAmount = 10;
+			int maxAmount = 10;
+			int minSpawnHeight = 10;
+			int maxSpawnHeight = 20;
+			std::string textureName;
+		};
+
+		std::unordered_map<std::string, Ore> ores = {
+			{ "iron_ore", { 55, 4, 20, 10, 20, "iron_ore" } },
+			{ "diamond_ore", { 222, 1, 8, 25, 30, "diamond_ore" } },
+		};
 	};
+
+	float tickMultiplayer = 1000.f;
 
 	GenerationRules generationRules;
 

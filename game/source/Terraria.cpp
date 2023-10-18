@@ -22,17 +22,19 @@
 
 #include "Terraria.h"
 
-#include "Shader.h"
-#include "UpdateableCollector.h"
-#include "Window.h"
-#include "World.h"
-#include "Initer.h"
-#include "WidgetReflector.h"
-#include "UtilsFunctions.h"
-#include "TextureManager.h"
 #include "Chunck.h"
 #include "Clock.h"
+#include "Initer.h"
+#include "Shader.h"
+#include "TerrariaGameMode.h"
+#include "TextureManager.h"
+#include "UpdateableCollector.h"
+#include "UtilsFunctions.h"
+#include "WidgetReflector.h"
+#include "Window.h"
+#include "World.h"
 #include "WorldVariables.h"
+#include "TerrariaWorld.h"
 
 #include <iostream>
 
@@ -48,12 +50,14 @@ Terraria::Terraria() :
 	cameraRightIA.setIsRepeatable(true);
 	cameraRightIA.onAction.subscribe([this](){
 			camera.move({1,0});
+			std::cout << camera.toGlobalCoordinates(camera.getPosition()).x / 2 << std::endl;
 		});
 
 	cameraLeftIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraLeftIA.setIsRepeatable(true);
 	cameraLeftIA.onAction.subscribe([this](){
 			camera.move({-1,0});
+			std::cout << camera.toGlobalCoordinates(camera.getPosition()).x / 2  << std::endl;
 		});
 
 	cameraTopIA.setFrequency(KeyboardInputAction::TimeT(1));
@@ -80,20 +84,22 @@ Terraria::Terraria() :
 			camera.zoom(0.001f);
 		});
 
-	Initer::init({.glfwVersion = {3, 3}, .windowSize = {3440, 1440}, .title = "My game"});
+	Initer::init({.glfwVersion = {3, 3}, .windowSize = {1000, 1000}, .title = "My game"});
 
 	shaderPack.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");
 	shaderPack.loadShaders("widget", "assets/shaders/widget.vert", "assets/shaders/widget.frag");
 
 	GetTextureManager().loadAllTextures();
 
-	camera.setSize({3440, 1440});
-	camera.setOrigin({3440 / 2, 1440 / 2});
+	camera.setSize({1000, 1000});
+	camera.setOrigin({1000 / 2, 1000 / 2});
 	GetWindow().setCamera(camera);
 }
 
 void Terraria::start()
 {
+	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
 	constexpr std::size_t size = 3;
 
 	std::vector<std::vector<Chunck>> chuncks;
@@ -111,7 +117,9 @@ void Terraria::start()
 		}
 	}
 
-	constexpr float tickMultiplayer = 1000.f; // TODO: move to XXX-State
+	WidgetReflector wr;
+	wr.activate();
+
 	while (!GetWindow().shouldClose())
 	{
 		Clock clock(true);
@@ -130,6 +138,6 @@ void Terraria::start()
 		GetWorld().update();
 		GetWindow().swapBuffers();
 		GetWindow().pollEvent();
-		camera.setTick(clock.stop() * tickMultiplayer);
+		camera.setTick(clock.stop() * gameMode->tickMultiplayer);
 	}
 }

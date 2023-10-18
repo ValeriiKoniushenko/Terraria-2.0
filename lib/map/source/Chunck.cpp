@@ -24,7 +24,6 @@
 
 #include "ShaderPack.h"
 #include "SimplexNoise.h"
-#include "TerrariaGameMode.h"
 #include "TerrariaWorld.h"
 #include "TextureManager.h"
 
@@ -42,7 +41,8 @@ void Chunck::draw(ShaderPack& shaderPack, Camera* camera /* = nullptr*/)
 void Chunck::generate(long long xOffset, long long yOffset)
 {
 	fillAir(xOffset, yOffset);
-	generateVertices(xOffset, yOffset);
+	generateMainMap(xOffset, yOffset);
+	generateOres(xOffset, yOffset);
 }
 
 void Chunck::fillAir(long long int xOffset, long long int yOffset)
@@ -71,23 +71,22 @@ void Chunck::fillAir(long long int xOffset, long long int yOffset)
 	}
 }
 
-void Chunck::generateVertices(long long int xOffset, long long int yOffset)
+void Chunck::generateMainMap(long long int xOffset, long long int yOffset)
 {
 	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
 
 	for (int x = 0; x < rules.chunckSize; ++x)
 	{
-		const float _y =
-			floor(SimplexNoise::noise(static_cast<float>(x + xOffset * rules.chunckSize)
-									  	/ rules.chunckSize / rules.chunckSmoothness)
-				  						* static_cast<float>(rules.chunckSize));
+		const float _y = floor(
+			SimplexNoise::noise(static_cast<float>(x + xOffset * rules.chunckSize) / rules.chunckSize / rules.chunckSmoothness) *
+			static_cast<float>(rules.chunckSize));
 
 		const int y = static_cast<int>(_y) + -yOffset * rules.chunckSize;
 
 		if (y >= 0 && y < rules.chunckSize)
 		{
 			blocks_[y][x].setTexture(GetTextureManager()["grass_block_side"]);
-			for (int yDirt = y + 1; yDirt < rules.chunckSize && yDirt < y + 5; ++yDirt)
+			for (int yDirt = y + 1; yDirt < rules.chunckSize && yDirt < y + rules.dirtHeight; ++yDirt)
 			{
 				blocks_[yDirt][x].setTexture(GetTextureManager()["dirt"]);
 			}
@@ -110,6 +109,54 @@ void Chunck::generateVertices(long long int xOffset, long long int yOffset)
 			for (int yStone = yDirt; yStone < rules.chunckSize; ++yStone)
 			{
 				blocks_[yStone][x].setTexture(GetTextureManager()["stone"]);
+			}
+		}
+	}
+}
+
+void Chunck::generateOres(long long int xOffset, long long int yOffset)
+{
+	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+
+	for (int y = 0; y < rules.chunckSize; ++y)
+	{
+		for (int x = 0; x < rules.chunckSize; ++x)
+		{
+			auto& block = blocks_[y][x];
+
+			long long realY = yOffset * rules.chunckSize + y;
+
+			if (block.getTexture().getName() == "stone")
+			{
+				for (auto& ore : rules.ores)
+				{
+					walkGenerator(x, y, realY, ore.second);
+				}
+			}
+		}
+	}
+}
+
+void Chunck::walkGenerator(long long int x, long long int y, long long realY, const TerrariaGameMode::GenerationRules::Ore& ore)
+{
+	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+
+	if (rand() % ore.density == 0 && ore.minSpawnHeight <= realY && ore.maxSpawnHeight >= realY)
+	{
+		int maxAmount = (rand() % (ore.maxAmount - ore.minAmount)) + ore.minAmount;
+		for (int amount = 0; amount < maxAmount; ++amount)
+		{
+			if (x < rules.chunckSize && x >= 0 && y < rules.chunckSize && y >= 0)
+			{
+				blocks_[y][x].setTexture(GetTextureManager()[ore.textureName]);
+			}
+
+			switch(rand() % 4)
+			{
+				case 0: ++x; break;
+				case 1: --x; break;
+				case 2: ++y; break;
+				case 3: --y; break;
 			}
 		}
 	}

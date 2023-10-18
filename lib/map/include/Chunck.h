@@ -24,6 +24,7 @@
 
 #include "NotCopyableButMovable.h"
 #include "Block.h"
+#include "TerrariaGameMode.h"
 
 #include <vector>
 #include <memory>
@@ -40,7 +41,9 @@ public:
 
 private:
 	void fillAir(long long xOffset, long long yOffset);
-	void generateVertices(long long xOffset, long long yOffset);
+	void generateMainMap(long long xOffset, long long yOffset);
+	void generateOres(long long xOffset, long long yOffset);
+	void walkGenerator(long long x, long long y, long long realY, const TerrariaGameMode::GenerationRules::Ore& ore);
 
 private:
 	Container blocks_;
