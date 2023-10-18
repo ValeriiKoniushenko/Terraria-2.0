@@ -16,4 +16,7 @@ target_link_libraries(Map PUBLIC
 	Core-Wrappers
 	Texture-Manager
 	Shapes
+	Simplex-Noise
+	Game
+	Base-World
 )

@@ -20,41 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "Logger.h"
-#include "Terraria.h"
+#pragma once
 
-#include <stdexcept>
+#include "BaseWorld.h"
+#include "Singleton.h"
 
-int main()
+class TerrariaWorld : public BaseWorld, public Singleton<TerrariaWorld>
 {
-#if __DEBUG
-	Terraria program;
-	program.start();
-#else
-	try
-	{
-		Terraria program;
-		program.start();
-	}
-	catch (std::runtime_error& error)
-	{
-		spdlog::get("core")->critical("STD Error: {}", error.what());
-		MessageBoxA(nullptr, error.what(), "STD Error", MB_OK);
-		return 1;
-	}
-	catch (std::exception& error)
-	{
-		spdlog::get("core")->critical("Unknown STD Error");
-		MessageBoxA(nullptr, error.what(), "Unknown STD Error", MB_OK);
-		return 2;
-	}
-	catch (...)
-	{
-		spdlog::get("core")->critical("Unknown Error");
-		MessageBoxA(nullptr, "An unknown error. To know details go to log.", "Unknown Error", MB_OK);
-		return 3;
-	}
-#endif
+public:
+	TerrariaWorld();
 
-	return 0;
-}
+private:
+
+};
+
+TerrariaWorld& GetTerrariaWorld();

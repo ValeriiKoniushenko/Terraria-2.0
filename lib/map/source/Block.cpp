@@ -54,7 +54,7 @@ void Block::setPosition(glm::vec2 position)
 void Block::setTexture(Texture& texture)
 {
 	widget_.setTexture(texture);
-	//widget_.calculateFitTextureSize();
+	widget_.calculateFitTextureSize();
 }
 
 [[nodiscard]] const Texture& Block::getTexture() const

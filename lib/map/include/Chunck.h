@@ -34,10 +34,13 @@ class Chunck : public Utils::NotCopyableButMovable
 {
 public:
 	using Container = std::vector<std::vector<Block>>;
-	inline static constexpr std::size_t chunckSize = 16;
 
 	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
 	void generate(long long xOffset, long long yOffset);
+
+private:
+	void fillAir(long long xOffset, long long yOffset);
+	void generateVertices(long long xOffset, long long yOffset);
 
 private:
 	Container blocks_;

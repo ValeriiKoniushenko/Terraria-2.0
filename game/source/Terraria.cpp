@@ -22,26 +22,17 @@
 
 #include "Terraria.h"
 
-#include "GladWrapper.h"
-#include "Image.h"
 #include "Shader.h"
-#include "Texture.h"
 #include "UpdateableCollector.h"
-#include "WidgetReflector.h"
 #include "Window.h"
 #include "World.h"
-#include "WorldVariables.h"
-#include "ft2build.h"
-#include FT_FREETYPE_H
-#include "Font.h"
 #include "Initer.h"
-#include "Rect.h"
-#include "ShaderPack.h"
-#include "StopMotionAnimation.h"
-#include "TextBox.h"
+#include "WidgetReflector.h"
 #include "UtilsFunctions.h"
 #include "TextureManager.h"
 #include "Chunck.h"
+#include "Clock.h"
+#include "WorldVariables.h"
 
 #include <iostream>
 
@@ -53,69 +44,92 @@ Terraria::Terraria() :
 	, cameraZoomUpIA("Camera zoom up", Keyboard::Key::PgUp)
 	, cameraZoomDownIA("Camera zoom down", Keyboard::Key::PgDown)
 {
-	cameraRightIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraRightIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraRightIA.setIsRepeatable(true);
 	cameraRightIA.onAction.subscribe([this](){
-			camera.move({10,0});
+			camera.move({1,0});
 		});
 
-	cameraLeftIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraLeftIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraLeftIA.setIsRepeatable(true);
 	cameraLeftIA.onAction.subscribe([this](){
-			camera.move({-10,0});
+			camera.move({-1,0});
 		});
 
-	cameraTopIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraTopIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraTopIA.setIsRepeatable(true);
 	cameraTopIA.onAction.subscribe([this](){
-			camera.move({0,-10});
+			camera.move({0,-1});
 		});
 
-	cameraBottomIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraBottomIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraBottomIA.setIsRepeatable(true);
 	cameraBottomIA.onAction.subscribe([this](){
-			camera.move({0,10});
+			camera.move({0,1});
 		});
 
-	cameraZoomUpIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraZoomUpIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraZoomUpIA.setIsRepeatable(true);
 	cameraZoomUpIA.onAction.subscribe([this](){
-			camera.zoom(-0.01f);
+			camera.zoom(-0.001f);
 		});
 
-	cameraZoomDownIA.setFrequency(KeyboardInputAction::TimeT(10));
+	cameraZoomDownIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraZoomDownIA.setIsRepeatable(true);
 	cameraZoomDownIA.onAction.subscribe([this](){
-			camera.zoom(0.01f);
+			camera.zoom(0.001f);
 		});
 
-	Initer::init({.glfwVersion = {3, 3}, .windowSize = {1366, 768}, .title = "My game"});
+	Initer::init({.glfwVersion = {3, 3}, .windowSize = {3440, 1440}, .title = "My game"});
 
 	shaderPack.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");
 	shaderPack.loadShaders("widget", "assets/shaders/widget.vert", "assets/shaders/widget.frag");
 
 	GetTextureManager().loadAllTextures();
 
-	camera.setSize({1366, 768});
+	camera.setSize({3440, 1440});
+	camera.setOrigin({3440 / 2, 1440 / 2});
+	GetWindow().setCamera(camera);
 }
+
 void Terraria::start()
 {
-	Chunck chunck1;
-	chunck1.generate(0,0);
-	Chunck chunck2;
-	chunck2.generate(1,0);
+	constexpr std::size_t size = 3;
 
+	std::vector<std::vector<Chunck>> chuncks;
+	chuncks.resize(size);
+	for (auto& y : chuncks)
+	{
+		y.resize(size);
+	}
+
+	for (int i = 0; i < chuncks.size(); ++i)
+	{
+		for (int j = 0; j < chuncks[i].size(); ++j)
+		{
+			chuncks[i][j].generate(j, i - chuncks[i].size() / 2);
+		}
+	}
+
+	constexpr float tickMultiplayer = 1000.f; // TODO: move to XXX-State
 	while (!GetWindow().shouldClose())
 	{
+		Clock clock(true);
 		GetWindow().clearColor({0.2f, 0.3f, 0.3f});
 		GetWindow().clear(GL_COLOR_BUFFER_BIT);
 
-		chunck1.draw(shaderPack, &camera);
-		chunck2.draw(shaderPack, &camera);
+		for (auto& y : chuncks)
+		{
+			for (auto& x : y)
+			{
+				x.draw(shaderPack, &camera);
+			}
+		}
 
 		GetUpdateableCollector().updateAll();
 		GetWorld().update();
 		GetWindow().swapBuffers();
 		GetWindow().pollEvent();
+		camera.setTick(clock.stop() * tickMultiplayer);
 	}
 }
