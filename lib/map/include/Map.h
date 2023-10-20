@@ -27,10 +27,17 @@
 
 #include <vector>
 
+class ShaderPack;
+
 class Map : public Utils::NotCopyableAndNotMovable
 {
 public:
 	using MapT = std::vector<std::vector<Chunck>>;
+
+	void generate(long long countOfChuncksByX, long long countOfChuncksByY);
+	void drawChunck(long long x, long long y, ShaderPack& shaderPack, Camera* camera = nullptr);
+	void drawChunckWithNeighbours(long long x, long long y, ShaderPack& shaderPack, Camera* camera = nullptr);
+	void prepareAllChuncks(ShaderPack& shaderPack);
 
 private:
 	MapT map;

@@ -27,6 +27,7 @@
 #include "Initer.h"
 #include "Shader.h"
 #include "TerrariaGameMode.h"
+#include "TerrariaWorld.h"
 #include "TextureManager.h"
 #include "UpdateableCollector.h"
 #include "UtilsFunctions.h"
@@ -34,12 +35,11 @@
 #include "Window.h"
 #include "World.h"
 #include "WorldVariables.h"
-#include "TerrariaWorld.h"
 
 #include <iostream>
 
-Terraria::Terraria() :
-	cameraRightIA("Camera to right", Keyboard::Key::D)
+Terraria::Terraria()
+	: cameraRightIA("Camera to right", Keyboard::Key::D)
 	, cameraLeftIA("Camera to left", Keyboard::Key::A)
 	, cameraTopIA("Camera to top", Keyboard::Key::W)
 	, cameraBottomIA("Camera to bottom", Keyboard::Key::S)
@@ -48,41 +48,35 @@ Terraria::Terraria() :
 {
 	cameraRightIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraRightIA.setIsRepeatable(true);
-	cameraRightIA.onAction.subscribe([this](){
-			camera.move({1,0});
-			std::cout << camera.toGlobalCoordinates(camera.getPosition()).x / 2 << std::endl;
+	cameraRightIA.onAction.subscribe(
+		[this]()
+		{
+			camera.move({1, 0});
 		});
 
 	cameraLeftIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraLeftIA.setIsRepeatable(true);
-	cameraLeftIA.onAction.subscribe([this](){
-			camera.move({-1,0});
-			std::cout << camera.toGlobalCoordinates(camera.getPosition()).x / 2  << std::endl;
+	cameraLeftIA.onAction.subscribe(
+		[this]()
+		{
+			camera.move({-1, 0});
 		});
 
 	cameraTopIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraTopIA.setIsRepeatable(true);
-	cameraTopIA.onAction.subscribe([this](){
-			camera.move({0,-1});
-		});
+	cameraTopIA.onAction.subscribe([this]() { camera.move({0, -1}); });
 
 	cameraBottomIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraBottomIA.setIsRepeatable(true);
-	cameraBottomIA.onAction.subscribe([this](){
-			camera.move({0,1});
-		});
+	cameraBottomIA.onAction.subscribe([this]() { camera.move({0, 1}); });
 
 	cameraZoomUpIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraZoomUpIA.setIsRepeatable(true);
-	cameraZoomUpIA.onAction.subscribe([this](){
-			camera.zoom(-0.001f);
-		});
+	cameraZoomUpIA.onAction.subscribe([this]() { camera.zoom(-0.001f); });
 
 	cameraZoomDownIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraZoomDownIA.setIsRepeatable(true);
-	cameraZoomDownIA.onAction.subscribe([this](){
-			camera.zoom(0.001f);
-		});
+	cameraZoomDownIA.onAction.subscribe([this]() { camera.zoom(0.001f); });
 
 	Initer::init({.glfwVersion = {3, 3}, .windowSize = {1000, 1000}, .title = "My game"});
 
@@ -92,7 +86,7 @@ Terraria::Terraria() :
 	GetTextureManager().loadAllTextures();
 
 	camera.setSize({1000, 1000});
-	camera.setOrigin({1000 / 2, 1000 / 2});
+	// camera.setOrigin({1000 / 2, 1000 / 2});
 	GetWindow().setCamera(camera);
 }
 
@@ -100,25 +94,8 @@ void Terraria::start()
 {
 	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
 
-	constexpr std::size_t size = 3;
-
-	std::vector<std::vector<Chunck>> chuncks;
-	chuncks.resize(size);
-	for (auto& y : chuncks)
-	{
-		y.resize(size);
-	}
-
-	for (int i = 0; i < chuncks.size(); ++i)
-	{
-		for (int j = 0; j < chuncks[i].size(); ++j)
-		{
-			chuncks[i][j].generate(j, i - chuncks[i].size() / 2);
-		}
-	}
-
-	WidgetReflector wr;
-	wr.activate();
+	// map.generate(gameMode->generationRules.countOfChuncksByX, gameMode->generationRules.countOfChuncksByY);
+	// map.prepareAllChuncks(shaderPack);
 
 	while (!GetWindow().shouldClose())
 	{
@@ -126,13 +103,13 @@ void Terraria::start()
 		GetWindow().clearColor({0.2f, 0.3f, 0.3f});
 		GetWindow().clear(GL_COLOR_BUFFER_BIT);
 
-		for (auto& y : chuncks)
-		{
-			for (auto& x : y)
-			{
-				x.draw(shaderPack, &camera);
-			}
-		}
+		glm::vec2 cameraPositionAtMap = camera.toGlobalCoordinates(camera.getPosition()) / 2.f;
+		cameraPositionAtMap += glm::vec2(GetWindow().getSize().width, GetWindow().getSize().height) / camera.getZoom() / 2.f;
+		cameraPositionAtMap /= gameMode->generationRules.chunckSize;
+		cameraPositionAtMap /= GetTextureManager()["air"].getImage()->getSize().x;
+		cameraPositionAtMap.y += floor(gameMode->generationRules.countOfChuncksByY / 2.f);
+
+		// map.drawChunckWithNeighbours(static_cast<long long>(cameraPositionAtMap.x), static_cast<long long>(cameraPositionAtMap.y), shaderPack, &camera);
 
 		GetUpdateableCollector().updateAll();
 		GetWorld().update();

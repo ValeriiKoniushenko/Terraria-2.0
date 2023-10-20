@@ -37,6 +37,7 @@ public:
 	using Container = std::vector<std::vector<Block>>;
 
 	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
+	void prepare(ShaderPack& shaderPack);
 	void generate(long long xOffset, long long yOffset);
 
 private:

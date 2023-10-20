@@ -81,3 +81,8 @@ void Block::draw(ShaderPack& shaderPack, Camera* camera/* = nullptr*/)
 {
 	widget_.draw(shaderPack, camera);
 }
+
+void Block::prepare(ShaderPack& shaderPack)
+{
+	widget_.prepare(shaderPack);
+}

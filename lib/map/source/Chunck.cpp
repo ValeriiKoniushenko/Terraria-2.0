@@ -161,3 +161,14 @@ void Chunck::walkGenerator(long long int x, long long int y, long long realY, co
 		}
 	}
 }
+
+void Chunck::prepare(ShaderPack& shaderPack)
+{
+	for (auto& y : blocks_)
+	{
+		for (auto& block : y)
+		{
+			block.prepare(shaderPack);
+		}
+	}
+}

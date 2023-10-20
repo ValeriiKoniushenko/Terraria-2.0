@@ -20,3 +20,58 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "Map.h"
+
+void Map::generate(long long countOfChuncksByX, long long countOfChuncksByY)
+{
+	if (countOfChuncksByX <= 0 || countOfChuncksByY <= 0)
+	{
+		throw std::runtime_error("Can't generate a map with zero chuncks by the axis X or Y.");
+	}
+
+	map.resize(countOfChuncksByY);
+
+	for (int i = 0; i < map.size(); ++i)
+	{
+		map[i].resize(countOfChuncksByX);
+
+		for (int j = 0; j < map[i].size(); ++j)
+		{
+			map[i][j].generate(j, i - map.size() / 2);
+		}
+	}
+}
+
+void Map::drawChunck(long long x, long long y, ShaderPack& shaderPack, Camera* camera)
+{
+	if (x < 0 || y < 0 || y >= map.size() || x >= map[y].size())
+	{
+		return;
+	}
+
+	map[y][x].draw(shaderPack, camera);
+}
+
+void Map::drawChunckWithNeighbours(long long int x, long long int y, ShaderPack& shaderPack, Camera* camera)
+{
+	drawChunck(x, y, shaderPack, camera);
+	drawChunck(x + 1, y, shaderPack, camera);
+	drawChunck(x - 1, y, shaderPack, camera);
+	drawChunck(x, y + 1, shaderPack, camera);
+	drawChunck(x, y - 1, shaderPack, camera);
+	drawChunck(x + 1, y - 1, shaderPack, camera);
+	drawChunck(x - 1, y - 1, shaderPack, camera);
+	drawChunck(x + 1, y + 1, shaderPack, camera);
+	drawChunck(x - 1, y + 1, shaderPack, camera);
+}
+
+void Map::prepareAllChuncks(ShaderPack& shaderPack)
+{
+	for (auto& y : map)
+	{
+		for (auto& chunck : y)
+		{
+			chunck.prepare(shaderPack);
+		}
+	}
+}

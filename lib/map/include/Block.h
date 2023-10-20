@@ -46,6 +46,8 @@ public:
 
 	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
 
+	void prepare(ShaderPack& shaderPack);
+
 private:
 	float health_ = 0;
 	Widget widget_;
