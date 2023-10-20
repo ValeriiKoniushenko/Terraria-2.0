@@ -12,6 +12,7 @@ if (DEFINED CMAKE_BUILD_TYPE)
 	if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 		message(STATUS "Project build type: DEBUG")
 		add_compile_definitions(__DEBUG)
+		add_compile_definitions(OPENGL_DEBUG)
 	endif ()
 endif ()
 

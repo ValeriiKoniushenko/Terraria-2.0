@@ -25,6 +25,7 @@
 #include "Chunck.h"
 #include "Clock.h"
 #include "Initer.h"
+#include "InstancedWidget.h"
 #include "Shader.h"
 #include "TerrariaGameMode.h"
 #include "TerrariaWorld.h"
@@ -37,6 +38,9 @@
 #include "WorldVariables.h"
 
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 Terraria::Terraria()
 	: cameraRightIA("Camera to right", Keyboard::Key::D)
@@ -82,6 +86,7 @@ Terraria::Terraria()
 
 	shaderPack.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");
 	shaderPack.loadShaders("widget", "assets/shaders/widget.vert", "assets/shaders/widget.frag");
+	shaderPack.loadShaders("instansed-widget", "assets/shaders/instanced-widget.vert", "assets/shaders/instanced-widget.frag");
 
 	GetTextureManager().loadAllTextures();
 
@@ -94,8 +99,18 @@ void Terraria::start()
 {
 	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
 
-	// map.generate(gameMode->generationRules.countOfChuncksByX, gameMode->generationRules.countOfChuncksByY);
-	// map.prepareAllChuncks(shaderPack);
+	Image image("assets/textures/block/stone.png");
+	image.setInternalChannel(Gl::Texture::Channel::RGBA);
+
+	Texture texture(Gl::Texture::Target::Texture2D, true, true);
+	texture.setImage(image);
+	texture.setMagAndMinFilter(Gl::Texture::MagFilter::Linear, Gl::Texture::MinFilter::LinearMipmapLinear);
+
+	InstancedWidget rect;
+	rect.setTexture(texture);
+	rect.calculateFitTextureSize();
+	rect.getTransforms().emplace_back(0,0);
+	rect.getTransforms().emplace_back(1024,1024);
 
 	while (!GetWindow().shouldClose())
 	{
@@ -109,7 +124,7 @@ void Terraria::start()
 		cameraPositionAtMap /= GetTextureManager()["air"].getImage()->getSize().x;
 		cameraPositionAtMap.y += floor(gameMode->generationRules.countOfChuncksByY / 2.f);
 
-		// map.drawChunckWithNeighbours(static_cast<long long>(cameraPositionAtMap.x), static_cast<long long>(cameraPositionAtMap.y), shaderPack, &camera);
+		rect.draw(shaderPack, &camera);
 
 		GetUpdateableCollector().updateAll();
 		GetWorld().update();
