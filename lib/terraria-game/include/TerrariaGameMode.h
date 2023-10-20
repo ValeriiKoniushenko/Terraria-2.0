@@ -33,12 +33,12 @@ class TerrariaGameMode : public BaseGameMode
 public:
 	struct GenerationRules
 	{
-		int chunckSize = 4;
+		int chunckSize = 16;
 		int chunckSmoothness = 3;
 		int dirtHeight = 10;
-		int height = 48;
+		int height = 256;
 		int countOfChuncksByY = height / chunckSize;
-		int countOfChuncksByX = 3;
+		int countOfChuncksByX = 16;
 
 		struct Ore
 		{

@@ -14,4 +14,5 @@ target_include_directories(Texture-Manager PUBLIC include/)
 target_link_libraries(Texture-Manager PUBLIC
 	Utils
 	Core-Wrappers
+	Shapes
 )

@@ -26,18 +26,156 @@
 #include "SimplexNoise.h"
 #include "TerrariaWorld.h"
 #include "TextureManager.h"
+#include "InstancedWidget.h"
 
-void Chunck::draw(ShaderPack& shaderPack, Camera* camera /* = nullptr*/)
+void Chunck::draw(ShaderPack& shaderPack, Camera* camera/* = nullptr*/)
 {
+	for (auto& block : widgets_)
+	{
+		block.second.draw(shaderPack, camera);
+	}
+}
+
+void Chunck::generate(long long int xOffset, long long int yOffset)
+{
+	fillAir(xOffset, yOffset);
+	generateMainMap(xOffset, yOffset);
+	generateOres(xOffset, yOffset);
+	calculateInstanceData(xOffset, yOffset);
+}
+
+void Chunck::fillAir(long long int xOffset, long long int yOffset)
+{
+	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+
+	blocks_.resize(rules.chunckSize);
 	for (auto& row : blocks_)
 	{
+		row.resize(rules.chunckSize);
 		for (auto& block : row)
 		{
-			block.draw(shaderPack, camera);
+			block.setTexture(getTexture("air"));
 		}
 	}
 }
 
+void Chunck::generateMainMap(long long int xOffset, long long int yOffset)
+{
+	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+	for (int x = 0; x < rules.chunckSize; ++x)
+	{
+		const float _y = floor(
+			SimplexNoise::noise(static_cast<float>(x + xOffset * rules.chunckSize) / rules.chunckSize / rules.chunckSmoothness) *
+			static_cast<float>(rules.chunckSize));
+
+		const int y = static_cast<int>(_y) + -yOffset * rules.chunckSize;
+
+		if (y >= 0 && y < rules.chunckSize)
+		{
+			blocks_[y][x].setTexture(getTexture("grass_block_side"));
+			for (int yDirt = y + 1; yDirt < rules.chunckSize && yDirt < y + rules.dirtHeight; ++yDirt)
+			{
+				blocks_[yDirt][x].setTexture(getTexture("dirt"));
+			}
+			for (int yStone = y + rules.dirtHeight; yStone < rules.chunckSize; ++yStone)
+			{
+				blocks_[yStone][x].setTexture(getTexture("stone"));
+			}
+		}
+
+		int yDirt = 0;
+		if (y < 0 && y + rules.dirtHeight > 0)
+		{
+			for (; yDirt < rules.chunckSize && yDirt < y + rules.dirtHeight; ++yDirt)
+			{
+				blocks_[yDirt][x].setTexture(getTexture("dirt"));
+			}
+		}
+		if (y < 0)
+		{
+			for (int yStone = yDirt; yStone < rules.chunckSize; ++yStone)
+			{
+				blocks_[yStone][x].setTexture(getTexture("stone"));
+			}
+		}
+	}
+}
+
+void Chunck::calculateInstanceData(long long int xOffset, long long int yOffset)
+{
+	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+
+	for (std::size_t i = 0; i < blocks_.size(); ++i)
+	{
+		for (std::size_t j = 0; j < blocks_[i].size(); ++j)
+		{
+			auto* texture = blocks_[i][j].getTexture();
+
+			glm::vec2 position = texture->getImage()->getSize() * glm::ivec2(j, i);
+			const glm::vec2 chunckSizePx = {rules.chunckSize * texture->getImage()->getSize().x, rules.chunckSize * texture->getImage()->getSize().y};
+			position += glm::vec2{xOffset * chunckSizePx.x, yOffset * chunckSizePx.y};
+
+			widgets_[texture->getName()].getTransforms().emplace_back(position);
+		}
+	}
+}
+
+Texture& Chunck::getTexture(const std::string& name)
+{
+	widgets_.emplace(name, GetTextureManager().getInstancedWidget(name));
+	return GetTextureManager().getTexture(name);
+}
+
+
+void Chunck::generateOres(long long int xOffset, long long int yOffset)
+{
+	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+
+	for (int y = 0; y < rules.chunckSize; ++y)
+	{
+		for (int x = 0; x < rules.chunckSize; ++x)
+		{
+			auto& block = blocks_[y][x];
+
+			long long realY = yOffset * rules.chunckSize + y;
+
+			if (block.getTexture()->getName() == "stone")
+			{
+				for (auto& ore : rules.ores)
+				{
+					walkGenerator(x, y, realY, ore.second);
+				}
+			}
+		}
+	}
+}
+
+void Chunck::walkGenerator(long long int x, long long int y, long long realY, const TerrariaGameMode::GenerationRules::Ore& ore)
+{
+	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+
+	if (rand() % ore.density == 0 && ore.minSpawnHeight <= realY && ore.maxSpawnHeight >= realY)
+	{
+		int maxAmount = (rand() % (ore.maxAmount - ore.minAmount)) + ore.minAmount;
+		for (int amount = 0; amount < maxAmount; ++amount)
+		{
+			if (x < rules.chunckSize && x >= 0 && y < rules.chunckSize && y >= 0)
+			{
+				blocks_[y][x].setTexture(getTexture(ore.textureName));
+			}
+
+			switch(rand() % 4)
+			{
+				case 0: ++x; break;
+				case 1: --x; break;
+				case 2: ++y; break;
+				case 3: --y; break;
+			}
+		}
+	}
+}
+
+/*
 void Chunck::generate(long long xOffset, long long yOffset)
 {
 	fillAir(xOffset, yOffset);
@@ -114,54 +252,6 @@ void Chunck::generateMainMap(long long int xOffset, long long int yOffset)
 	}
 }
 
-void Chunck::generateOres(long long int xOffset, long long int yOffset)
-{
-	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
-
-	for (int y = 0; y < rules.chunckSize; ++y)
-	{
-		for (int x = 0; x < rules.chunckSize; ++x)
-		{
-			auto& block = blocks_[y][x];
-
-			long long realY = yOffset * rules.chunckSize + y;
-
-			if (block.getTexture().getName() == "stone")
-			{
-				for (auto& ore : rules.ores)
-				{
-					walkGenerator(x, y, realY, ore.second);
-				}
-			}
-		}
-	}
-}
-
-void Chunck::walkGenerator(long long int x, long long int y, long long realY, const TerrariaGameMode::GenerationRules::Ore& ore)
-{
-	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
-
-	if (rand() % ore.density == 0 && ore.minSpawnHeight <= realY && ore.maxSpawnHeight >= realY)
-	{
-		int maxAmount = (rand() % (ore.maxAmount - ore.minAmount)) + ore.minAmount;
-		for (int amount = 0; amount < maxAmount; ++amount)
-		{
-			if (x < rules.chunckSize && x >= 0 && y < rules.chunckSize && y >= 0)
-			{
-				blocks_[y][x].setTexture(GetTextureManager()[ore.textureName]);
-			}
-
-			switch(rand() % 4)
-			{
-				case 0: ++x; break;
-				case 1: --x; break;
-				case 2: ++y; break;
-				case 3: --y; break;
-			}
-		}
-	}
-}
-
 void Chunck::prepare(ShaderPack& shaderPack)
 {
 	for (auto& y : blocks_)
@@ -171,4 +261,4 @@ void Chunck::prepare(ShaderPack& shaderPack)
 			block.prepare(shaderPack);
 		}
 	}
-}
+}*/

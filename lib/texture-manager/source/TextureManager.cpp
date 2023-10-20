@@ -44,10 +44,20 @@ void TextureManager::loadAllTextures()
 		texture.setImage(images_[dirEntry.path().stem().string()]);
 		texture.setMagAndMinFilter(Gl::Texture::MagFilter::Linear, Gl::Texture::MinFilter::LinearMipmapLinear);
 		textures_.emplace(dirEntry.path().stem().string(), std::move(texture));
+
+		InstancedWidget widget;
+		widget.setTexture(textures_[dirEntry.path().stem().string()]);
+		widget.calculateFitTextureSize();
+		widgets_.emplace(dirEntry.path().stem().string(), std::move(widget));
 	}
 }
 
-Texture& TextureManager::operator[](const std::string& blockName)
+Texture& TextureManager::getTexture(const std::string& blockName)
 {
 	return textures_[blockName];
+}
+
+InstancedWidget& TextureManager::getInstancedWidget(const std::string& blockName)
+{
+	return widgets_[blockName];
 }

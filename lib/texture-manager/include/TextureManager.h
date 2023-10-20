@@ -25,17 +25,21 @@
 #include "Singleton.h"
 #include "Texture.h"
 #include "Image.h"
+#include "InstancedWidget.h"
+
 #include <unordered_map>
 
 class TextureManager : public Singleton<TextureManager>
 {
 public:
 	void loadAllTextures();
-	Texture& operator[](const std::string& blockName);
+	Texture& getTexture(const std::string& blockName);
+	InstancedWidget& getInstancedWidget(const std::string& blockName);
 
 private:
 	std::unordered_map<std::string, Image> images_;
 	std::unordered_map<std::string, Texture> textures_;
+	std::unordered_map<std::string, InstancedWidget> widgets_;
 };
 
 TextureManager& GetTextureManager();

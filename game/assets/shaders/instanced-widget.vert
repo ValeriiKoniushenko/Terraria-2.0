@@ -18,7 +18,7 @@ void main()
     ioTextRectSize = aTextRectSize / uAtlasSize;
 
     vec2 vertex = aVertex;
-    vertex += aTransform * vec2(1,-1);
+    vertex += aTransform * vec2(2,-2);
 
     vec4 offset = vec4(1.0f, -1.0f, 0.f, 0.f);
     gl_Position = uCameraMatrix * vec4(vertex / uResolution, 0.0, 1.0) - offset;

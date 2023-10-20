@@ -52,26 +52,13 @@ void Map::drawChunck(long long x, long long y, ShaderPack& shaderPack, Camera* c
 	map[y][x].draw(shaderPack, camera);
 }
 
-void Map::drawChunckWithNeighbours(long long int x, long long int y, ShaderPack& shaderPack, Camera* camera)
+void Map::drawChunckWithNeighbours(long long int x, long long int y, long long radius, ShaderPack& shaderPack, Camera* camera)
 {
-	drawChunck(x, y, shaderPack, camera);
-	drawChunck(x + 1, y, shaderPack, camera);
-	drawChunck(x - 1, y, shaderPack, camera);
-	drawChunck(x, y + 1, shaderPack, camera);
-	drawChunck(x, y - 1, shaderPack, camera);
-	drawChunck(x + 1, y - 1, shaderPack, camera);
-	drawChunck(x - 1, y - 1, shaderPack, camera);
-	drawChunck(x + 1, y + 1, shaderPack, camera);
-	drawChunck(x - 1, y + 1, shaderPack, camera);
-}
-
-void Map::prepareAllChuncks(ShaderPack& shaderPack)
-{
-	for (auto& y : map)
+	for (long long i = y - radius; i <= y + radius; ++i)
 	{
-		for (auto& chunck : y)
+		for (long long j = x - radius; j <= x + radius; ++j)
 		{
-			chunck.prepare(shaderPack);
+			drawChunck(j, i, shaderPack, camera);
 		}
 	}
 }

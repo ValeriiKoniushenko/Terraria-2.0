@@ -55,7 +55,7 @@ Terraria::Terraria()
 	cameraRightIA.onAction.subscribe(
 		[this]()
 		{
-			camera.move({1, 0});
+			camera.move({4, 0});
 		});
 
 	cameraLeftIA.setFrequency(KeyboardInputAction::TimeT(1));
@@ -63,16 +63,16 @@ Terraria::Terraria()
 	cameraLeftIA.onAction.subscribe(
 		[this]()
 		{
-			camera.move({-1, 0});
+			camera.move({-4, 0});
 		});
 
 	cameraTopIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraTopIA.setIsRepeatable(true);
-	cameraTopIA.onAction.subscribe([this]() { camera.move({0, -1}); });
+	cameraTopIA.onAction.subscribe([this]() { camera.move({0, -4}); });
 
 	cameraBottomIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraBottomIA.setIsRepeatable(true);
-	cameraBottomIA.onAction.subscribe([this]() { camera.move({0, 1}); });
+	cameraBottomIA.onAction.subscribe([this]() { camera.move({0, 4}); });
 
 	cameraZoomUpIA.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraZoomUpIA.setIsRepeatable(true);
@@ -99,18 +99,19 @@ void Terraria::start()
 {
 	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
 
-	Image image("assets/textures/block/stone.png");
-	image.setInternalChannel(Gl::Texture::Channel::RGBA);
+	map.generate(gameMode->generationRules.countOfChuncksByX, gameMode->generationRules.countOfChuncksByY);
 
-	Texture texture(Gl::Texture::Target::Texture2D, true, true);
-	texture.setImage(image);
-	texture.setMagAndMinFilter(Gl::Texture::MagFilter::Linear, Gl::Texture::MinFilter::LinearMipmapLinear);
+	/*std::vector<std::vector<Chunck>> chuncks;
+	chuncks.resize(3);
+	for (int i = 0; i < chuncks.size(); ++i)
+	{
+		chuncks[i].resize(3);
 
-	InstancedWidget rect;
-	rect.setTexture(texture);
-	rect.calculateFitTextureSize();
-	rect.getTransforms().emplace_back(0,0);
-	rect.getTransforms().emplace_back(1024,1024);
+		for (int j = 0; j < chuncks[i].size(); ++j)
+		{
+			chuncks[i][j].generate(j, i - chuncks.size() / 2);
+		}
+	}*/
 
 	while (!GetWindow().shouldClose())
 	{
@@ -121,10 +122,10 @@ void Terraria::start()
 		glm::vec2 cameraPositionAtMap = camera.toGlobalCoordinates(camera.getPosition()) / 2.f;
 		cameraPositionAtMap += glm::vec2(GetWindow().getSize().width, GetWindow().getSize().height) / camera.getZoom() / 2.f;
 		cameraPositionAtMap /= gameMode->generationRules.chunckSize;
-		cameraPositionAtMap /= GetTextureManager()["air"].getImage()->getSize().x;
+		cameraPositionAtMap /= GetTextureManager().getTexture("air").getImage()->getSize().x;
 		cameraPositionAtMap.y += floor(gameMode->generationRules.countOfChuncksByY / 2.f);
 
-		rect.draw(shaderPack, &camera);
+		map.drawChunckWithNeighbours(cameraPositionAtMap.x, cameraPositionAtMap.y, 1, shaderPack, &camera);
 
 		GetUpdateableCollector().updateAll();
 		GetWorld().update();

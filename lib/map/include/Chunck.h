@@ -25,8 +25,10 @@
 #include "NotCopyableButMovable.h"
 #include "Block.h"
 #include "TerrariaGameMode.h"
+#include "InstancedWidget.h"
 
 #include <vector>
+#include <unordered_map>
 #include <memory>
 
 class ShaderPack;
@@ -37,7 +39,6 @@ public:
 	using Container = std::vector<std::vector<Block>>;
 
 	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
-	void prepare(ShaderPack& shaderPack);
 	void generate(long long xOffset, long long yOffset);
 
 private:
@@ -45,7 +46,11 @@ private:
 	void generateMainMap(long long xOffset, long long yOffset);
 	void generateOres(long long xOffset, long long yOffset);
 	void walkGenerator(long long x, long long y, long long realY, const TerrariaGameMode::GenerationRules::Ore& ore);
+	void calculateInstanceData(long long int xOffset, long long int yOffset);
+
+	Texture& getTexture(const std::string& name);
 
 private:
 	Container blocks_;
+	std::unordered_map<std::string, InstancedWidget> widgets_;
 };

@@ -36,8 +36,7 @@ public:
 
 	void generate(long long countOfChuncksByX, long long countOfChuncksByY);
 	void drawChunck(long long x, long long y, ShaderPack& shaderPack, Camera* camera = nullptr);
-	void drawChunckWithNeighbours(long long x, long long y, ShaderPack& shaderPack, Camera* camera = nullptr);
-	void prepareAllChuncks(ShaderPack& shaderPack);
+	void drawChunckWithNeighbours(long long x, long long y, long long radius, ShaderPack& shaderPack, Camera* camera = nullptr);
 
 private:
 	MapT map;

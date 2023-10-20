@@ -22,33 +22,22 @@
 
 #pragma once
 
-#include "NotCopyableButMovable.h"
+#include "CopyableAndMoveable.h"
 #include "Widget.h"
 
 class ShaderPack;
 
-class Block : public Utils::NotCopyableButMovable
+class Block : public Utils::CopyableAndMoveable
 {
 public:
-	Block() = default;
-	Block(Block&& other) noexcept;
-	Block& operator=(Block&& other) noexcept;
-
-	void setPosition(glm::vec2 position);
-	[[nodiscard]] glm::vec2 getPosition() const;
-
 	void setTexture(Texture& texture);
-	[[nodiscard]] const Texture& getTexture() const;
-	[[nodiscard]] Texture& getTexture();
+	[[nodiscard]] const Texture* getTexture() const;
+	[[nodiscard]] Texture* getTexture();
 
 	void setHealth(float health);
 	[[nodiscard]] float getHealth() const;
 
-	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
-
-	void prepare(ShaderPack& shaderPack);
-
 private:
 	float health_ = 0;
-	Widget widget_;
+	Texture* texture_ = nullptr;
 };

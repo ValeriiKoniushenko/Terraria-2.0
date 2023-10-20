@@ -26,45 +26,19 @@
 #include "ShaderPack.h"
 #include "Camera.h"
 
-Block::Block(Block&& other) noexcept
-{
-	*this = std::move(other);
-}
-
-Block& Block::operator=(Block&& other) noexcept
-{
-	health_ = other.health_;
-	widget_ = std::move(other.widget_);
-
-	other.health_ = {};
-
-	return *this;
-}
-
-void Block::setPosition(glm::vec2 position)
-{
-	widget_.setPosition(position);
-}
-
-[[nodiscard]] glm::vec2 Block::getPosition() const
-{
-	return widget_.getPosition();
-}
-
 void Block::setTexture(Texture& texture)
 {
-	widget_.setTexture(texture);
-	widget_.calculateFitTextureSize();
+	texture_ = &texture;
 }
 
-[[nodiscard]] const Texture& Block::getTexture() const
+[[nodiscard]] const Texture* Block::getTexture() const
 {
-	return widget_.getTexture();
+	return texture_;
 }
 
-[[nodiscard]] Texture& Block::getTexture()
+[[nodiscard]] Texture* Block::getTexture()
 {
-	return widget_.getTexture();
+	return texture_;
 }
 
 void Block::setHealth(float health)
@@ -75,14 +49,4 @@ void Block::setHealth(float health)
 [[nodiscard]] float Block::getHealth() const
 {
 	return health_;
-}
-
-void Block::draw(ShaderPack& shaderPack, Camera* camera/* = nullptr*/)
-{
-	widget_.draw(shaderPack, camera);
-}
-
-void Block::prepare(ShaderPack& shaderPack)
-{
-	widget_.prepare(shaderPack);
 }
