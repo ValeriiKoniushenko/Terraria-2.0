@@ -22,6 +22,11 @@
 
 #include "Map.h"
 
+#include "TerrariaWorld.h"
+#include "TextureManager.h"
+#include "Window.h"
+#include "Camera.h"
+
 void Map::generate(long long countOfChuncksByX, long long countOfChuncksByY)
 {
 	if (countOfChuncksByX <= 0 || countOfChuncksByY <= 0)
@@ -52,13 +57,41 @@ void Map::drawChunck(long long x, long long y, ShaderPack& shaderPack, Camera* c
 	map[y][x].draw(shaderPack, camera);
 }
 
-void Map::drawChunckWithNeighbours(long long int x, long long int y, long long radius, ShaderPack& shaderPack, Camera* camera)
+void Map::drawChunckWithNeighbours(glm::ivec2 position, long long radius, ShaderPack& shaderPack, Camera* camera)
 {
-	for (long long i = y - radius; i <= y + radius; ++i)
+	for (long long i = position.y - radius; i <= position.y + radius; ++i)
 	{
-		for (long long j = x - radius; j <= x + radius; ++j)
+		for (long long j = position.x - radius; j <= position.x + radius; ++j)
 		{
 			drawChunck(j, i, shaderPack, camera);
 		}
 	}
+}
+
+glm::ivec2 Map::getCameraPositionAtMap(Camera& camera)
+{
+	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
+	glm::vec2 cameraPositionAtMap = camera.toGlobalCoordinates(camera.getPosition()) / 2.f;
+	cameraPositionAtMap += glm::vec2(GetWindow().getSize().width, GetWindow().getSize().height) / camera.getZoom() / 2.f;
+	cameraPositionAtMap /= gameMode->generationRules.chunckSize;
+	cameraPositionAtMap /= GetTextureManager().getTexture("air").getImage()->getSize().x;
+	cameraPositionAtMap.y += floor(gameMode->generationRules.countOfChuncksByY / 2.f);
+
+	return cameraPositionAtMap;
+}
+
+int Map::getNeighboursCount(Camera& camera)
+{
+	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
+	int neighboursCount =
+		GetWindow().getSize().width / camera.getZoom() / GetTextureManager().getTexture("air").getImage()->getSize().x;
+	neighboursCount /= gameMode->generationRules.chunckSize;
+	if (neighboursCount < 1)
+	{
+		neighboursCount = 1;
+	}
+
+	return neighboursCount;
 }

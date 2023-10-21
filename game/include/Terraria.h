@@ -22,26 +22,11 @@
 
 #pragma once
 
-#include "Camera.h"
-#include "InputAction.h"
-#include "NotCopyableAndNotMovable.h"
-#include "ShaderPack.h"
-#include "Map.h"
+#include "App.h"
 
-class Terraria : public Utils::NotCopyableAndNotMovable
+class Terraria : public App
 {
 public:
 	Terraria();
-	void start();
-
-private:
-	KeyboardInputAction cameraRightIA;
-	KeyboardInputAction cameraLeftIA;
-	KeyboardInputAction cameraTopIA;
-	KeyboardInputAction cameraBottomIA;
-	KeyboardInputAction cameraZoomUpIA;
-	KeyboardInputAction cameraZoomDownIA;
-	Camera camera;
-	ShaderPack shaderPack;
-	Map map;
+	void start() override;
 };

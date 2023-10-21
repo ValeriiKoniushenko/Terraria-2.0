@@ -23,12 +23,31 @@
 #pragma once
 
 #include "BaseGameState.h"
+#include "Camera.h"
+#include "InputAction.h"
+#include "Map.h"
+#include "ShaderPack.h"
+
+class TerrariaGameMode;
 
 class TerrariaGameState : public BaseGameState
 {
 public:
+	TerrariaGameState();
 
+	void initialize();
+	void tick(float tick);
 
 private:
+	TerrariaGameMode* gameMode = nullptr;
 
+	Map map;
+	Camera camera;
+	KeyboardInputAction cameraRightIA;
+	KeyboardInputAction cameraLeftIA;
+	KeyboardInputAction cameraTopIA;
+	KeyboardInputAction cameraBottomIA;
+	KeyboardInputAction cameraZoomUpIA;
+	KeyboardInputAction cameraZoomDownIA;
+	ShaderPack shaderPack;
 };

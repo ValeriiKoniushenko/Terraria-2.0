@@ -22,110 +22,41 @@
 
 #include "Terraria.h"
 
-#include "Chunck.h"
 #include "Clock.h"
 #include "Initer.h"
-#include "InstancedWidget.h"
-#include "Shader.h"
-#include "TerrariaGameMode.h"
+#include "TerrariaGameState.h"
 #include "TerrariaWorld.h"
 #include "TextureManager.h"
 #include "UpdateableCollector.h"
 #include "UtilsFunctions.h"
-#include "WidgetReflector.h"
 #include "Window.h"
 #include "World.h"
-#include "WorldVariables.h"
-
-#include <iostream>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 Terraria::Terraria()
-	: cameraRightIA("Camera to right", Keyboard::Key::D)
-	, cameraLeftIA("Camera to left", Keyboard::Key::A)
-	, cameraTopIA("Camera to top", Keyboard::Key::W)
-	, cameraBottomIA("Camera to bottom", Keyboard::Key::S)
-	, cameraZoomUpIA("Camera zoom up", Keyboard::Key::PgUp)
-	, cameraZoomDownIA("Camera zoom down", Keyboard::Key::PgDown)
 {
-	cameraRightIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraRightIA.setIsRepeatable(true);
-	cameraRightIA.onAction.subscribe(
-		[this]()
-		{
-			camera.move({4, 0});
-		});
-
-	cameraLeftIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraLeftIA.setIsRepeatable(true);
-	cameraLeftIA.onAction.subscribe(
-		[this]()
-		{
-			camera.move({-4, 0});
-		});
-
-	cameraTopIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraTopIA.setIsRepeatable(true);
-	cameraTopIA.onAction.subscribe([this]() { camera.move({0, -4}); });
-
-	cameraBottomIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraBottomIA.setIsRepeatable(true);
-	cameraBottomIA.onAction.subscribe([this]() { camera.move({0, 4}); });
-
-	cameraZoomUpIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraZoomUpIA.setIsRepeatable(true);
-	cameraZoomUpIA.onAction.subscribe([this]() { camera.zoom(-0.001f); });
-
-	cameraZoomDownIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraZoomDownIA.setIsRepeatable(true);
-	cameraZoomDownIA.onAction.subscribe([this]() { camera.zoom(0.001f); });
-
 	Initer::init({.glfwVersion = {3, 3}, .windowSize = {1000, 1000}, .title = "My game"});
-
-	shaderPack.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");
-	shaderPack.loadShaders("widget", "assets/shaders/widget.vert", "assets/shaders/widget.frag");
-	shaderPack.loadShaders("instansed-widget", "assets/shaders/instanced-widget.vert", "assets/shaders/instanced-widget.frag");
-
-	GetTextureManager().loadAllTextures();
-
-	camera.setSize({1000, 1000});
-	// camera.setOrigin({1000 / 2, 1000 / 2});
-	GetWindow().setCamera(camera);
 }
 
 void Terraria::start()
 {
-	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+	auto* gameState = dynamic_cast<TerrariaGameState*>(GetTerrariaWorld().gameState.get());
+	gameState->initialize();
 
-	map.generate(gameMode->generationRules.countOfChuncksByX, gameMode->generationRules.countOfChuncksByY);
-
+	Clock clock;
 	while (!GetWindow().shouldClose())
 	{
-		Clock clock(true);
+		clock.start();
 		GetWindow().clearColor({0.2f, 0.3f, 0.3f});
 		GetWindow().clear(GL_COLOR_BUFFER_BIT);
 
-		glm::vec2 cameraPositionAtMap = camera.toGlobalCoordinates(camera.getPosition()) / 2.f;
-		cameraPositionAtMap += glm::vec2(GetWindow().getSize().width, GetWindow().getSize().height) / camera.getZoom() / 2.f;
-		cameraPositionAtMap /= gameMode->generationRules.chunckSize;
-		cameraPositionAtMap /= GetTextureManager().getTexture("air").getImage()->getSize().x;
-		cameraPositionAtMap.y += floor(gameMode->generationRules.countOfChuncksByY / 2.f);
-
-		int neighboursCount = GetWindow().getSize().width / camera.getZoom() / GetTextureManager().getTexture("air").getImage()->getSize().x;
-		neighboursCount /= gameMode->generationRules.chunckSize;
-		if (neighboursCount < 1)
-		{
-			neighboursCount = 1;
-		}
-
-		map.drawChunckWithNeighbours(cameraPositionAtMap.x, cameraPositionAtMap.y, neighboursCount, shaderPack, &camera);
+		gameState->tick(clock.getGap());
 
 		GetUpdateableCollector().updateAll();
 		GetWorld().update();
 		GetWindow().swapBuffers();
 		GetWindow().pollEvent();
-		camera.setTick(clock.stop() * gameMode->tickMultiplayer);
+		clock.stop();
 	}
+
+	GetTerrariaWorld().clear();
 }
