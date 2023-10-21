@@ -101,18 +101,6 @@ void Terraria::start()
 
 	map.generate(gameMode->generationRules.countOfChuncksByX, gameMode->generationRules.countOfChuncksByY);
 
-	/*std::vector<std::vector<Chunck>> chuncks;
-	chuncks.resize(3);
-	for (int i = 0; i < chuncks.size(); ++i)
-	{
-		chuncks[i].resize(3);
-
-		for (int j = 0; j < chuncks[i].size(); ++j)
-		{
-			chuncks[i][j].generate(j, i - chuncks.size() / 2);
-		}
-	}*/
-
 	while (!GetWindow().shouldClose())
 	{
 		Clock clock(true);
@@ -125,7 +113,14 @@ void Terraria::start()
 		cameraPositionAtMap /= GetTextureManager().getTexture("air").getImage()->getSize().x;
 		cameraPositionAtMap.y += floor(gameMode->generationRules.countOfChuncksByY / 2.f);
 
-		map.drawChunckWithNeighbours(cameraPositionAtMap.x, cameraPositionAtMap.y, 1, shaderPack, &camera);
+		int neighboursCount = GetWindow().getSize().width / camera.getZoom() / GetTextureManager().getTexture("air").getImage()->getSize().x;
+		neighboursCount /= gameMode->generationRules.chunckSize;
+		if (neighboursCount < 1)
+		{
+			neighboursCount = 1;
+		}
+
+		map.drawChunckWithNeighbours(cameraPositionAtMap.x, cameraPositionAtMap.y, neighboursCount, shaderPack, &camera);
 
 		GetUpdateableCollector().updateAll();
 		GetWorld().update();
