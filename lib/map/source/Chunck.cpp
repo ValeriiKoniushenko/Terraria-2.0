@@ -178,7 +178,12 @@ void Chunck::walkGenerator(long long int x, long long int y, long long realY, co
 	}
 }
 
-std::vector<Block>& Chunck::operator[](int y)
+const std::vector<Block>& Chunck::operator[](int y) const
 {
 	return blocks_.at(y);
+}
+
+void Chunck::setBlockAt(int x, int y, const std::string& texture)
+{
+	blocks_[y][x].setTexture(getTexture(texture));
 }

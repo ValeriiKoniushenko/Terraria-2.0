@@ -49,6 +49,7 @@ private:
 	void generateCaves(long long countOfChuncksByX, long long countOfChuncksByY);
 	void generateCave(long long int chunckX, long long int chunckY);
 	void setTextureAt(int chunckX, int chunckY, int x, int y, int radius, Texture& texture);
+	void generateBedrock(long long int countOfChuncksByX, long long int countOfChuncksByY);
 
 private:
 	MapT map_;

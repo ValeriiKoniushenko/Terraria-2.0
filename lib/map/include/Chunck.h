@@ -41,8 +41,8 @@ public:
 	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
 	void generate(long long xOffset, long long yOffset);
 	void calculateInstanceData(long long int xOffset, long long int yOffset);
-
-	std::vector<Block>& operator[](int y);
+	void setBlockAt(int x, int y, const std::string& texture);
+	const std::vector<Block>& operator[](int y) const;
 
 public:
 	bool caveCanBeGenerated = false;

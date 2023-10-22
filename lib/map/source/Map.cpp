@@ -49,6 +49,7 @@ void Map::generate(long long countOfChuncksByX, long long countOfChuncksByY)
 	}
 
 	generateCaves(countOfChuncksByX, countOfChuncksByY);
+	generateBedrock(countOfChuncksByX, countOfChuncksByY);
 
 	for (int i = 0; i < map_.size(); ++i)
 	{
@@ -286,7 +287,7 @@ void Map::setTextureAt(int chunckX, int chunckY, int x, int y, int radius, Textu
 			if (chunckY >= generationRules.countOfChuncksByY)
 				chunckY = generationRules.countOfChuncksByY - 1;
 
-			map_[chunckY][chunckX][fakeI][fakeJ].setTexture(GetTextureManager().getTexture("air"));
+			map_[chunckY][chunckX].setBlockAt(fakeJ, fakeI, "air");
 
 			if (i < 0)
 			{
@@ -304,6 +305,19 @@ void Map::setTextureAt(int chunckX, int chunckY, int x, int y, int radius, Textu
 			{
 				--chunckX;
 			}
+		}
+	}
+}
+
+void Map::generateBedrock(long long int countOfChuncksByX, long long int countOfChuncksByY)
+{
+	auto& generationRules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+
+	for (std::size_t i = 0; i < countOfChuncksByX; ++i)
+	{
+		for (std::size_t j = 0; j < generationRules.chunckSize; ++j)
+		{
+			map_[countOfChuncksByY - 1][i].setBlockAt(j, generationRules.chunckSize - 1, "bedrock");
 		}
 	}
 }
