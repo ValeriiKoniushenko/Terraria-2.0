@@ -24,15 +24,18 @@
 
 #include "NotCopyableAndNotMovable.h"
 #include "Chunck.h"
+#include "TerrariaGameMode.h"
 
 #include <vector>
 
 class ShaderPack;
+class Texture;
 
 class Map : public Utils::NotCopyableAndNotMovable
 {
 public:
 	using MapT = std::vector<std::vector<Chunck>>;
+	using Biome = TerrariaGameMode::GenerationRules::Biome;
 
 	void generate(long long countOfChuncksByX, long long countOfChuncksByY);
 	void drawChunck(long long x, long long y, ShaderPack& shaderPack, Camera* camera = nullptr);
@@ -41,5 +44,13 @@ public:
 	int getNeighboursCount(Camera& camera);
 
 private:
-	MapT map;
+	void generateBiomes(long long countOfChuncksByX, long long countOfChuncksByY);
+	void generateRandomBiomes(long long countOfChuncksByX, long long countOfChuncksByY);
+	void generateCaves(long long countOfChuncksByX, long long countOfChuncksByY);
+	void generateCave(long long int chunckX, long long int chunckY);
+	void setTextureAt(int chunckX, int chunckY, int x, int y, int radius, Texture& texture);
+
+private:
+	MapT map_;
+	std::vector<std::vector<Biome>> biomePerChunck_;
 };

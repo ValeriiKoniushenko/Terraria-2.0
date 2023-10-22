@@ -41,7 +41,6 @@ void Chunck::generate(long long int xOffset, long long int yOffset)
 	fillAir(xOffset, yOffset);
 	generateMainMap(xOffset, yOffset);
 	generateOres(xOffset, yOffset);
-	calculateInstanceData(xOffset, yOffset);
 }
 
 void Chunck::fillAir(long long int xOffset, long long int yOffset)
@@ -96,6 +95,10 @@ void Chunck::generateMainMap(long long int xOffset, long long int yOffset)
 			for (int yStone = yDirt; yStone < rules.chunckSize; ++yStone)
 			{
 				blocks_[yStone][x].setTexture(getTexture("stone"));
+				if (rand() % rules.caveChance == 0)
+				{
+					caveCanBeGenerated = true;
+				}
 			}
 		}
 	}
@@ -175,90 +178,7 @@ void Chunck::walkGenerator(long long int x, long long int y, long long realY, co
 	}
 }
 
-/*
-void Chunck::generate(long long xOffset, long long yOffset)
+std::vector<Block>& Chunck::operator[](int y)
 {
-	fillAir(xOffset, yOffset);
-	generateMainMap(xOffset, yOffset);
-	generateOres(xOffset, yOffset);
+	return blocks_.at(y);
 }
-
-void Chunck::fillAir(long long int xOffset, long long int yOffset)
-{
-	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
-
-	std::size_t i = 0;
-	std::size_t j = 0;
-	blocks_.resize(rules.chunckSize);
-
-	for (auto& row : blocks_)
-	{
-		row.resize(rules.chunckSize);
-		i = 0;
-		for (auto& block : row)
-		{
-			auto& texture = GetTextureManager()["air"];
-			auto size = texture.getImage()->getSize();
-			const glm::vec2 chunckSizePx = {rules.chunckSize * size.x, rules.chunckSize * size.y};
-			const glm::vec2 offset = {xOffset * chunckSizePx.x, yOffset * chunckSizePx.y};
-
-			block.setPosition({offset.x + i++ * size.x, offset.y + j * size.y});
-			block.setTexture(texture);
-		}
-		++j;
-	}
-}
-
-void Chunck::generateMainMap(long long int xOffset, long long int yOffset)
-{
-	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
-
-	for (int x = 0; x < rules.chunckSize; ++x)
-	{
-		const float _y = floor(
-			SimplexNoise::noise(static_cast<float>(x + xOffset * rules.chunckSize) / rules.chunckSize / rules.chunckSmoothness) *
-			static_cast<float>(rules.chunckSize));
-
-		const int y = static_cast<int>(_y) + -yOffset * rules.chunckSize;
-
-		if (y >= 0 && y < rules.chunckSize)
-		{
-			blocks_[y][x].setTexture(GetTextureManager()["grass_block_side"]);
-			for (int yDirt = y + 1; yDirt < rules.chunckSize && yDirt < y + rules.dirtHeight; ++yDirt)
-			{
-				blocks_[yDirt][x].setTexture(GetTextureManager()["dirt"]);
-			}
-			for (int yStone = y + rules.dirtHeight; yStone < rules.chunckSize; ++yStone)
-			{
-				blocks_[yStone][x].setTexture(GetTextureManager()["stone"]);
-			}
-		}
-
-		int yDirt = 0;
-		if (y < 0 && y + rules.dirtHeight > 0)
-		{
-			for (; yDirt < rules.chunckSize && yDirt < y + rules.dirtHeight; ++yDirt)
-			{
-				blocks_[yDirt][x].setTexture(GetTextureManager()["dirt"]);
-			}
-		}
-		if (y < 0)
-		{
-			for (int yStone = yDirt; yStone < rules.chunckSize; ++yStone)
-			{
-				blocks_[yStone][x].setTexture(GetTextureManager()["stone"]);
-			}
-		}
-	}
-}
-
-void Chunck::prepare(ShaderPack& shaderPack)
-{
-	for (auto& y : blocks_)
-	{
-		for (auto& block : y)
-		{
-			block.prepare(shaderPack);
-		}
-	}
-}*/

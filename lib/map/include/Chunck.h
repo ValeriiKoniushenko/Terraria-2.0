@@ -40,13 +40,18 @@ public:
 
 	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
 	void generate(long long xOffset, long long yOffset);
+	void calculateInstanceData(long long int xOffset, long long int yOffset);
+
+	std::vector<Block>& operator[](int y);
+
+public:
+	bool caveCanBeGenerated = false;
 
 private:
 	void fillAir(long long xOffset, long long yOffset);
 	void generateMainMap(long long xOffset, long long yOffset);
 	void generateOres(long long xOffset, long long yOffset);
 	void walkGenerator(long long x, long long y, long long realY, const TerrariaGameMode::GenerationRules::Ore& ore);
-	void calculateInstanceData(long long int xOffset, long long int yOffset);
 
 	Texture& getTexture(const std::string& name);
 

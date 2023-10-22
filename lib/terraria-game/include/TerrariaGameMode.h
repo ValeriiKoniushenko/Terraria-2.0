@@ -38,7 +38,12 @@ public:
 		int dirtHeight = 10;
 		int height = 256;
 		int countOfChuncksByY = height / chunckSize;
-		int countOfChuncksByX = 16;
+		int countOfChuncksByX = 128;
+		int maxSizeOfRandomBiomes = 10;
+		int minSizeOfRandomBiomes = 5;
+		int caveChance = 2000;
+		int maxCaveSize = 2000;
+		int minCaveSize = 10;
 
 		struct Ore
 		{
@@ -50,9 +55,24 @@ public:
 			std::string textureName;
 		};
 
+		struct Biome
+		{
+			std::string name;
+			int smoothness = 0;
+		};
+
 		std::unordered_map<std::string, Ore> ores = {
-			{ "iron_ore", { 55, 4, 20, 10, 20, "iron_ore" } },
-			{ "diamond_ore", { 222, 1, 8, 25, 30, "diamond_ore" } },
+			{ "iron_ore", { 100, 4, 20, 0, 128, "iron_ore" } },
+			{ "diamond_ore", { 250, 1, 8, 48, 128, "diamond_ore" } },
+		};
+		std::unordered_map<std::string, Biome> biomes =
+		{
+			{ "green plain", { "green plain", 30 } },
+			{ "green hills", { "green hills", 3 } },
+			{ "green mountains", { "green mountains", 1 } },
+			{ "water", { "water", 55 } },
+			{ "space", { "space", 3 } },
+			{ "hell", { "hell", 5 } },
 		};
 	};
 

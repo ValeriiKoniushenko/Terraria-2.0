@@ -27,58 +27,58 @@
 #include "Window.h"
 
 TerrariaGameState::TerrariaGameState()
-	: cameraRightIA("Camera to right", Keyboard::Key::D)
-	, cameraLeftIA("Camera to left", Keyboard::Key::A)
-	, cameraTopIA("Camera to top", Keyboard::Key::W)
-	, cameraBottomIA("Camera to bottom", Keyboard::Key::S)
-	, cameraZoomUpIA("Camera zoom up", Keyboard::Key::PgUp)
-	, cameraZoomDownIA("Camera zoom down", Keyboard::Key::PgDown)
+	: cameraRightIA_("Camera to right", Keyboard::Key::D)
+	, cameraLeftIA_("Camera to left", Keyboard::Key::A)
+	, cameraTopIA_("Camera to top", Keyboard::Key::W)
+	, cameraBottomIA_("Camera to bottom", Keyboard::Key::S)
+	, cameraZoomUpIA_("Camera zoom up", Keyboard::Key::PgUp)
+	, cameraZoomDownIA_("Camera zoom down", Keyboard::Key::PgDown)
 {
 }
 
 void TerrariaGameState::initialize()
 {
-	cameraRightIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraRightIA.setIsRepeatable(true);
-	cameraRightIA.onAction.subscribe([this]() { camera.move({4, 0}); });
+	cameraRightIA_.setFrequency(KeyboardInputAction::TimeT(1));
+	cameraRightIA_.setIsRepeatable(true);
+	cameraRightIA_.onAction.subscribe([this]() { camera_.move({4, 0}); });
 
-	cameraLeftIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraLeftIA.setIsRepeatable(true);
-	cameraLeftIA.onAction.subscribe([this]() { camera.move({-4, 0}); });
+	cameraLeftIA_.setFrequency(KeyboardInputAction::TimeT(1));
+	cameraLeftIA_.setIsRepeatable(true);
+	cameraLeftIA_.onAction.subscribe([this]() { camera_.move({-4, 0}); });
 
-	cameraTopIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraTopIA.setIsRepeatable(true);
-	cameraTopIA.onAction.subscribe([this]() { camera.move({0, -4}); });
+	cameraTopIA_.setFrequency(KeyboardInputAction::TimeT(1));
+	cameraTopIA_.setIsRepeatable(true);
+	cameraTopIA_.onAction.subscribe([this]() { camera_.move({0, -4}); });
 
-	cameraBottomIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraBottomIA.setIsRepeatable(true);
-	cameraBottomIA.onAction.subscribe([this]() { camera.move({0, 4}); });
+	cameraBottomIA_.setFrequency(KeyboardInputAction::TimeT(1));
+	cameraBottomIA_.setIsRepeatable(true);
+	cameraBottomIA_.onAction.subscribe([this]() { camera_.move({0, 4}); });
 
-	cameraZoomUpIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraZoomUpIA.setIsRepeatable(true);
-	cameraZoomUpIA.onAction.subscribe([this]() { camera.zoom(-0.001f); });
+	cameraZoomUpIA_.setFrequency(KeyboardInputAction::TimeT(1));
+	cameraZoomUpIA_.setIsRepeatable(true);
+	cameraZoomUpIA_.onAction.subscribe([this]() { camera_.zoom(-0.001f); });
 
-	cameraZoomDownIA.setFrequency(KeyboardInputAction::TimeT(1));
-	cameraZoomDownIA.setIsRepeatable(true);
-	cameraZoomDownIA.onAction.subscribe([this]() { camera.zoom(0.001f); });
+	cameraZoomDownIA_.setFrequency(KeyboardInputAction::TimeT(1));
+	cameraZoomDownIA_.setIsRepeatable(true);
+	cameraZoomDownIA_.onAction.subscribe([this]() { camera_.zoom(0.001f); });
 
-	shaderPack.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");
-	shaderPack.loadShaders("widget", "assets/shaders/widget.vert", "assets/shaders/widget.frag");
-	shaderPack.loadShaders("instansed-widget", "assets/shaders/instanced-widget.vert", "assets/shaders/instanced-widget.frag");
+	shaderPack_.loadShaders("text", "assets/shaders/text.vert", "assets/shaders/text.frag");
+	shaderPack_.loadShaders("widget", "assets/shaders/widget.vert", "assets/shaders/widget.frag");
+	shaderPack_.loadShaders("instansed-widget", "assets/shaders/instanced-widget.vert", "assets/shaders/instanced-widget.frag");
 
 	GetTextureManager().loadAllTextures();
 
-	camera.setSize({1000, 1000});
-	GetWindow().setCamera(camera);
+	camera_.setSize({1000, 1000});
+	GetWindow().setCamera(camera_);
 
 	gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
 
-	map.generate(gameMode->generationRules.countOfChuncksByX, gameMode->generationRules.countOfChuncksByY);
+	map_.generate(gameMode->generationRules.countOfChuncksByX, gameMode->generationRules.countOfChuncksByY);
 }
 
 void TerrariaGameState::tick(float tick)
 {
-	map.drawChunckWithNeighbours(map.getCameraPositionAtMap(camera), map.getNeighboursCount(camera), shaderPack, &camera);
+	map_.drawChunckWithNeighbours(map_.getCameraPositionAtMap(camera_), map_.getNeighboursCount(camera_), shaderPack_, &camera_);
 
-	camera.setTick(tick * gameMode->tickMultiplayer);
+	camera_.setTick(tick * gameMode->tickMultiplayer);
 }

@@ -22,10 +22,10 @@
 
 #include "Map.h"
 
+#include "Camera.h"
 #include "TerrariaWorld.h"
 #include "TextureManager.h"
 #include "Window.h"
-#include "Camera.h"
 
 void Map::generate(long long countOfChuncksByX, long long countOfChuncksByY)
 {
@@ -34,27 +34,41 @@ void Map::generate(long long countOfChuncksByX, long long countOfChuncksByY)
 		throw std::runtime_error("Can't generate a map with zero chuncks by the axis X or Y.");
 	}
 
-	map.resize(countOfChuncksByY);
+	generateBiomes(countOfChuncksByX, countOfChuncksByY);
 
-	for (int i = 0; i < map.size(); ++i)
+	map_.resize(countOfChuncksByY);
+
+	for (int i = 0; i < map_.size(); ++i)
 	{
-		map[i].resize(countOfChuncksByX);
+		map_[i].resize(countOfChuncksByX);
 
-		for (int j = 0; j < map[i].size(); ++j)
+		for (int j = 0; j < map_[i].size(); ++j)
 		{
-			map[i][j].generate(j, i - map.size() / 2);
+			map_[i][j].generate(j, i - map_.size() / 2);
+		}
+	}
+
+	generateCaves(countOfChuncksByX, countOfChuncksByY);
+
+	for (int i = 0; i < map_.size(); ++i)
+	{
+		map_[i].resize(countOfChuncksByX);
+
+		for (int j = 0; j < map_[i].size(); ++j)
+		{
+			map_[i][j].calculateInstanceData(j, i - map_.size() / 2);
 		}
 	}
 }
 
 void Map::drawChunck(long long x, long long y, ShaderPack& shaderPack, Camera* camera)
 {
-	if (x < 0 || y < 0 || y >= map.size() || x >= map[y].size())
+	if (x < 0 || y < 0 || y >= map_.size() || x >= map_[y].size())
 	{
 		return;
 	}
 
-	map[y][x].draw(shaderPack, camera);
+	map_[y][x].draw(shaderPack, camera);
 }
 
 void Map::drawChunckWithNeighbours(glm::ivec2 position, long long radius, ShaderPack& shaderPack, Camera* camera)
@@ -94,4 +108,202 @@ int Map::getNeighboursCount(Camera& camera)
 	}
 
 	return neighboursCount;
+}
+
+void Map::generateBiomes(long long countOfChuncksByX, long long countOfChuncksByY)
+{
+	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
+	std::size_t mapPartSize = gameMode->generationRules.countOfChuncksByY / 3;	  // count of regions(space, earth, hell)
+
+	biomePerChunck_.resize(countOfChuncksByY);
+	for (std::size_t i = 0; i < biomePerChunck_.size(); ++i)
+	{
+		biomePerChunck_[i].resize(countOfChuncksByX);
+		for (std::size_t j = 0; j < biomePerChunck_[i].size(); ++j)
+		{
+			Biome biome;
+
+			if (i < mapPartSize)
+			{
+				biome = gameMode->generationRules.biomes["space"];
+			}
+			else if (i < mapPartSize * 2)
+			{
+				biome = gameMode->generationRules.biomes["green plain"];
+			}
+			else
+			{
+				biome = gameMode->generationRules.biomes["hell"];
+			}
+
+			biomePerChunck_[i][j] = biome;
+		}
+	}
+}
+
+void Map::generateRandomBiomes(long long int countOfChuncksByX, long long int countOfChuncksByY)
+{
+	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
+	int biomePoint = rand() % countOfChuncksByX;
+	std::size_t mapPartSize = gameMode->generationRules.countOfChuncksByY / 3;	  // count of regions(space, earth, hell)
+
+	/*for(std::size_t i = 0; i < biomePerChunck_.size(); ++i)
+	{
+
+		for (std::size_t j = 0; j < biomePerChunck_[i].size(); ++j)
+		{
+			Biome biome;
+
+			if (i < mapPartSize)
+				biome = gameMode->generationRules.biomes["space"];
+			else if (i < mapPartSize * 2)
+				biome = gameMode->generationRules.biomes["green plain"];
+			else
+				biome = gameMode->generationRules.biomes["hell"];
+
+			biomePerChunck_[i][j] = biome;
+		}
+	}*/
+}
+
+void Map::generateCaves(long long int countOfChuncksByX, long long int countOfChuncksByY)
+{
+	for (std::size_t i = 0; i < map_.size(); ++i)
+	{
+		for (std::size_t j = 0; j < map_[i].size(); ++j)
+		{
+			if (map_[i][j].caveCanBeGenerated)
+			{
+				generateCave(j, i);
+			}
+		}
+	}
+}
+
+void Map::generateCave(long long int chunckX, long long int chunckY)
+{
+	int x = 0, y = 0;
+
+	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
+	int size = rand() % (gameMode->generationRules.maxCaveSize - gameMode->generationRules.minCaveSize) +
+			   gameMode->generationRules.minCaveSize;
+	while (size >= 0)
+	{
+		setTextureAt(chunckX, chunckY, x, y, 1, GetTextureManager().getTexture("air"));
+
+		int nextPosition = rand() % 4;
+		switch(nextPosition)
+		{
+			case 0: ++x; break;
+			case 1: --x; break;
+			case 2: ++y; break;
+			case 3: --y; break;
+		}
+
+		if (x >= gameMode->generationRules.chunckSize)
+		{
+			++chunckX;
+			x = 0;
+		}
+		if (x < 0)
+		{
+			--chunckX;
+			x = gameMode->generationRules.chunckSize - 1;
+		}
+		if (y >= gameMode->generationRules.chunckSize)
+		{
+			++chunckY;
+			y = 0;
+		}
+		if (y < 0)
+		{
+			--chunckY;
+			y = gameMode->generationRules.chunckSize - 1;
+		}
+
+		if (chunckX < 0)
+		{
+			chunckX = 0;
+		}
+		if (chunckX >= gameMode->generationRules.countOfChuncksByX)
+		{
+			chunckX = gameMode->generationRules.countOfChuncksByX - 1;
+		}
+		if (chunckY < 0)
+		{
+			chunckY = 0;
+		}
+		if (chunckY >= gameMode->generationRules.countOfChuncksByY)
+		{
+			chunckY = gameMode->generationRules.countOfChuncksByY - 1;
+		}
+
+		--size;
+	}
+}
+
+void Map::setTextureAt(int chunckX, int chunckY, int x, int y, int radius, Texture& texture)
+{
+	auto& generationRules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+	auto chunckSize = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules.chunckSize;
+
+	for (int i = y - radius; i <= y + radius; ++i)
+	{
+		for (int j = x - radius; j <= x + radius; ++j)
+		{
+			int fakeI = i;
+			int fakeJ = j;
+			if (i < 0)
+			{
+				fakeI += chunckSize;
+				--chunckY;
+			}
+			if (i >= chunckSize)
+			{
+				fakeI = 0;
+				++chunckY;
+			}
+			if (j < 0)
+			{
+				fakeJ += chunckSize;
+				--chunckX;
+			}
+			if (j >= chunckSize)
+			{
+				fakeJ = 0;
+				++chunckX;
+			}
+
+			if (chunckX < 0)
+				chunckX = 0;
+			if (chunckX >= generationRules.countOfChuncksByX)
+				chunckX = generationRules.countOfChuncksByX - 1;
+			if (chunckY < 0)
+				chunckY = 0;
+			if (chunckY >= generationRules.countOfChuncksByY)
+				chunckY = generationRules.countOfChuncksByY - 1;
+
+			map_[chunckY][chunckX][fakeI][fakeJ].setTexture(GetTextureManager().getTexture("air"));
+
+			if (i < 0)
+			{
+				++chunckY;
+			}
+			if (i >= chunckSize)
+			{
+				--chunckY;
+			}
+			if (j < 0)
+			{
+				++chunckX;
+			}
+			if (j >= chunckSize)
+			{
+				--chunckX;
+			}
+		}
+	}
 }

@@ -41,13 +41,13 @@ public:
 private:
 	TerrariaGameMode* gameMode = nullptr;
 
-	Map map;
-	Camera camera;
-	KeyboardInputAction cameraRightIA;
-	KeyboardInputAction cameraLeftIA;
-	KeyboardInputAction cameraTopIA;
-	KeyboardInputAction cameraBottomIA;
-	KeyboardInputAction cameraZoomUpIA;
-	KeyboardInputAction cameraZoomDownIA;
-	ShaderPack shaderPack;
+	Map map_;
+	Camera camera_;
+	KeyboardInputAction cameraRightIA_;
+	KeyboardInputAction cameraLeftIA_;
+	KeyboardInputAction cameraTopIA_;
+	KeyboardInputAction cameraBottomIA_;
+	KeyboardInputAction cameraZoomUpIA_;
+	KeyboardInputAction cameraZoomDownIA_;
+	ShaderPack shaderPack_;
 };
