@@ -50,11 +50,10 @@ void Map::generate(long long countOfChuncksByX, long long countOfChuncksByY)
 
 	generateCaves(countOfChuncksByX, countOfChuncksByY);
 	generateBedrock(countOfChuncksByX, countOfChuncksByY);
+	generateAsteroids(countOfChuncksByX, countOfChuncksByY);
 
 	for (int i = 0; i < map_.size(); ++i)
 	{
-		map_[i].resize(countOfChuncksByX);
-
 		for (int j = 0; j < map_[i].size(); ++j)
 		{
 			map_[i][j].calculateInstanceData(j, i - map_.size() / 2);
@@ -287,7 +286,7 @@ void Map::setTextureAt(int chunckX, int chunckY, int x, int y, int radius, Textu
 			if (chunckY >= generationRules.countOfChuncksByY)
 				chunckY = generationRules.countOfChuncksByY - 1;
 
-			map_[chunckY][chunckX].setBlockAt(fakeJ, fakeI, "air");
+			map_[chunckY][chunckX].setBlockAt(fakeJ, fakeI, texture.getName());
 
 			if (i < 0)
 			{
@@ -319,5 +318,86 @@ void Map::generateBedrock(long long int countOfChuncksByX, long long int countOf
 		{
 			map_[countOfChuncksByY - 1][i].setBlockAt(j, generationRules.chunckSize - 1, "bedrock");
 		}
+	}
+}
+
+void Map::generateAsteroids(long long int countOfChuncksByX, long long int countOfChuncksByY)
+{
+	auto& generationRules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+
+	for (std::size_t i = 0; i < countOfChuncksByY / 3; ++i)
+	{
+		for (std::size_t j = 0; j < countOfChuncksByX; ++j)
+		{
+			if (rand() % generationRules.asteroidChance == 0)
+			{
+				generateAsteroid(j, i);
+			}
+		}
+	}
+}
+
+void Map::generateAsteroid(long long int chunckX, long long int chunckY)
+{
+	int x = 0, y = 0;
+
+	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
+	int size = rand() % (gameMode->generationRules.maxAsteroidSize - gameMode->generationRules.minAsteroidSize) +
+			   gameMode->generationRules.minAsteroidSize;
+	while (size >= 0)
+	{
+		setTextureAt(chunckX, chunckY, x, y, 1, GetTextureManager().getTexture("stone"));
+
+		int nextPosition = rand() % 6;
+		switch(nextPosition)
+		{
+			case 0: ++x; break;
+			case 1: ++x; break;
+			case 2: --x; break;
+			case 3: --x; break;
+			case 4: ++y; break;
+			case 5: --y; break;
+		}
+
+		if (x >= gameMode->generationRules.chunckSize)
+		{
+			++chunckX;
+			x = 0;
+		}
+		if (x < 0)
+		{
+			--chunckX;
+			x = gameMode->generationRules.chunckSize - 1;
+		}
+		if (y >= gameMode->generationRules.chunckSize)
+		{
+			++chunckY;
+			y = 0;
+		}
+		if (y < 0)
+		{
+			--chunckY;
+			y = gameMode->generationRules.chunckSize - 1;
+		}
+
+		if (chunckX < 0)
+		{
+			chunckX = 0;
+		}
+		if (chunckX >= gameMode->generationRules.countOfChuncksByX)
+		{
+			chunckX = gameMode->generationRules.countOfChuncksByX - 1;
+		}
+		if (chunckY < 0)
+		{
+			chunckY = 0;
+		}
+		if (chunckY >= gameMode->generationRules.countOfChuncksByY)
+		{
+			chunckY = gameMode->generationRules.countOfChuncksByY - 1;
+		}
+
+		--size;
 	}
 }

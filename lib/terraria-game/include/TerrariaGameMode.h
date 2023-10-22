@@ -36,7 +36,7 @@ public:
 		int chunckSize = 16;
 		int chunckSmoothness = 3;
 		int dirtHeight = 10;
-		int height = 512;
+		int height = 4096;
 		int countOfChuncksByY = height / chunckSize;
 		int countOfChuncksByX = 32;
 		int maxSizeOfRandomBiomes = 10;
@@ -44,6 +44,9 @@ public:
 		int caveChance = 2000;
 		int maxCaveSize = 2000;
 		int minCaveSize = 10;
+		int asteroidChance = 100;
+		int maxAsteroidSize = 2000;
+		int minAsteroidSize = 200;
 
 		struct Ore
 		{
