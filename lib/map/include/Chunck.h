@@ -26,6 +26,7 @@
 #include "Block.h"
 #include "TerrariaGameMode.h"
 #include "InstancedWidget.h"
+#include "StopMotionAnimation.h"
 
 #include <vector>
 #include <unordered_map>
@@ -41,7 +42,7 @@ public:
 	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
 	void generate(long long xOffset, long long yOffset);
 	void calculateInstanceData(long long int xOffset, long long int yOffset);
-	void setBlockAt(int x, int y, const std::string& texture);
+	void setBlockAt(int x, int y, const std::string& texture, bool isAnimation = false);
 	const std::vector<Block>& operator[](int y) const;
 
 public:
@@ -53,9 +54,10 @@ private:
 	void generateOres(long long xOffset, long long yOffset);
 	void walkGenerator(long long x, long long y, long long realY, const TerrariaGameMode::GenerationRules::Ore& ore);
 
-	Texture& getTexture(const std::string& name);
+	Texture& getTexture(const std::string& name, bool isAnimation = false);
 
 private:
 	Container blocks_;
 	std::unordered_map<std::string, InstancedWidget> widgets_;
+	std::unordered_map<std::string, StopMotionAnimation<InstancedWidget>> animations_;
 };

@@ -52,6 +52,7 @@ private:
 	void generateBedrock(long long int countOfChuncksByX, long long int countOfChuncksByY);
 	void generateAsteroids(long long int countOfChuncksByX, long long int countOfChuncksByY);
 	void generateAsteroid(long long int chunckX, long long int chunckY);
+	void generateHell(long long int countOfChuncksByX, long long int countOfChuncksByY);
 
 private:
 	MapT map_;

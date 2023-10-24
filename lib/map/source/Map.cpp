@@ -48,9 +48,10 @@ void Map::generate(long long countOfChuncksByX, long long countOfChuncksByY)
 		}
 	}
 
+	generateHell(countOfChuncksByX, countOfChuncksByY);
+	generateAsteroids(countOfChuncksByX, countOfChuncksByY);
 	generateCaves(countOfChuncksByX, countOfChuncksByY);
 	generateBedrock(countOfChuncksByX, countOfChuncksByY);
-	generateAsteroids(countOfChuncksByX, countOfChuncksByY);
 
 	for (int i = 0; i < map_.size(); ++i)
 	{
@@ -400,4 +401,38 @@ void Map::generateAsteroid(long long int chunckX, long long int chunckY)
 
 		--size;
 	}
+}
+
+void Map::generateHell(long long int countOfChuncksByX, long long int countOfChuncksByY)
+{
+	auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
+	for (int i = countOfChuncksByY - countOfChuncksByY / 3; i < countOfChuncksByY; ++i)
+	{
+		for (int j = 0; j < countOfChuncksByX; ++j)
+		{
+
+			for (int x = 0; x < gameMode->generationRules.chunckSize; ++x)
+			{
+				if (i == countOfChuncksByY - countOfChuncksByY / 3)
+				{
+					int limit = rand() % gameMode->generationRules.hellGradient;
+					for (int y = 0; y < limit; ++y)
+					{
+						map_[i][j].setBlockAt(x, gameMode->generationRules.chunckSize - y - 1, "netherrack", true);
+					}
+				}
+				else
+				{
+					for (int y = 0; y < gameMode->generationRules.chunckSize; ++y)
+					{
+						map_[i][j].setBlockAt(x, y, "netherrack", true);
+					}
+				}
+			}
+		}
+	}
+
+
+
 }

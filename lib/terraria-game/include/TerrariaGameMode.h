@@ -38,7 +38,7 @@ public:
 		int dirtHeight = 10;
 		int height = 4096;
 		int countOfChuncksByY = height / chunckSize;
-		int countOfChuncksByX = 32;
+		int countOfChuncksByX = 128;
 		int maxSizeOfRandomBiomes = 10;
 		int minSizeOfRandomBiomes = 5;
 		int caveChance = 2000;
@@ -47,6 +47,7 @@ public:
 		int asteroidChance = 100;
 		int maxAsteroidSize = 2000;
 		int minAsteroidSize = 200;
+		int hellGradient = 5;
 
 		struct Ore
 		{
@@ -85,6 +86,8 @@ public:
 
 	float tickMultiplayer = 1000.f;
 	GenerationRules generationRules;
+	int textureSize = 512;
+	std::size_t animationFrameGap = 50;
 
 private:
 

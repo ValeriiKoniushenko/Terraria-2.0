@@ -47,7 +47,7 @@ void TextureManager::loadAllTextures()
 
 		InstancedWidget widget;
 		widget.setTexture(textures_[dirEntry.path().stem().string()]);
-		widget.calculateFitTextureSize();
+		widget.setSize({512, 512});
 		widgets_.emplace(dirEntry.path().stem().string(), std::move(widget));
 	}
 }

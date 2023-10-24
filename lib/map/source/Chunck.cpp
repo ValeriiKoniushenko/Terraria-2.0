@@ -26,11 +26,15 @@
 #include "SimplexNoise.h"
 #include "TerrariaWorld.h"
 #include "TextureManager.h"
-#include "InstancedWidget.h"
 
 void Chunck::draw(ShaderPack& shaderPack, Camera* camera/* = nullptr*/)
 {
 	for (auto& block : widgets_)
+	{
+		block.second.draw(shaderPack, camera);
+	}
+
+	for (auto& block : animations_)
 	{
 		block.second.draw(shaderPack, camera);
 	}
@@ -95,6 +99,7 @@ void Chunck::generateMainMap(long long int xOffset, long long int yOffset)
 			for (int yStone = yDirt; yStone < rules.chunckSize; ++yStone)
 			{
 				blocks_[yStone][x].setTexture(getTexture("stone"));
+
 				if (rand() % rules.caveChance == 0)
 				{
 					caveCanBeGenerated = true;
@@ -106,26 +111,43 @@ void Chunck::generateMainMap(long long int xOffset, long long int yOffset)
 
 void Chunck::calculateInstanceData(long long int xOffset, long long int yOffset)
 {
-	auto& rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get())->generationRules;
+	auto* rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
+	for (auto& widget : widgets_)
+	{
+		widget.second.getTransforms().clear();
+	}
 
 	for (std::size_t i = 0; i < blocks_.size(); ++i)
 	{
 		for (std::size_t j = 0; j < blocks_[i].size(); ++j)
 		{
-			auto* texture = blocks_[i][j].getTexture();
-
-			glm::vec2 position = texture->getImage()->getSize() * glm::ivec2(j, i);
-			const glm::vec2 chunckSizePx = {rules.chunckSize * texture->getImage()->getSize().x, rules.chunckSize * texture->getImage()->getSize().y};
+			glm::vec2 position = rules->textureSize * glm::ivec2(j, i);
+			const glm::vec2 chunckSizePx = {rules->generationRules.chunckSize * rules->textureSize, rules->generationRules.chunckSize * rules->textureSize};
 			position += glm::vec2{xOffset * chunckSizePx.x, yOffset * chunckSizePx.y};
 
-			widgets_[texture->getName()].getTransforms().emplace_back(position);
+			widgets_[blocks_[i][j].getTexture()->getName()].getTransforms().emplace_back(position);
 		}
 	}
 }
 
-Texture& Chunck::getTexture(const std::string& name)
+Texture& Chunck::getTexture(const std::string& name, bool isAnimation/* = false*/)
 {
 	widgets_.emplace(name, GetTextureManager().getInstancedWidget(name));
+
+	if (isAnimation)
+	{
+		auto* rules = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
+		StopMotionAnimation<InstancedWidget> anim;
+		anim.setFrameGap(rules->animationFrameGap);
+		anim.setupAnimation(widgets_[name]);
+		anim.setMode(StopMotionAnimation<InstancedWidget>::Mode::Repeating);
+		anim.start();
+
+		animations_.emplace(name, std::move(anim));
+	}
+
 	return GetTextureManager().getTexture(name);
 }
 
@@ -183,7 +205,7 @@ const std::vector<Block>& Chunck::operator[](int y) const
 	return blocks_.at(y);
 }
 
-void Chunck::setBlockAt(int x, int y, const std::string& texture)
+void Chunck::setBlockAt(int x, int y, const std::string& texture, bool isAnimation/* = false*/)
 {
-	blocks_[y][x].setTexture(getTexture(texture));
+	blocks_[y][x].setTexture(getTexture(texture, isAnimation));
 }

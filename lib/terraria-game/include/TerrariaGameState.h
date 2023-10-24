@@ -27,6 +27,8 @@
 #include "InputAction.h"
 #include "Map.h"
 #include "ShaderPack.h"
+#include "InstancedWidget.h"
+#include "StopMotionAnimation.h"
 
 class TerrariaGameMode;
 
@@ -40,6 +42,11 @@ public:
 
 private:
 	TerrariaGameMode* gameMode = nullptr;
+
+	InstancedWidget widget;
+	InstancedWidget widget1;
+	StopMotionAnimation<InstancedWidget> anim;
+	StopMotionAnimation<InstancedWidget> anim1;
 
 	Map map_;
 	Camera camera_;
