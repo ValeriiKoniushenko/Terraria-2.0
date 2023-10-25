@@ -24,6 +24,9 @@
 class Entity : public Utils::CopyableAndMoveable
 {
 public:
+	Entity();
+	~Entity() override;
+
 	[[nodiscard]] glm::vec2 getPosition() const;
 	void setPosition(glm::vec2 position);
 

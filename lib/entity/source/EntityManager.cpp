@@ -22,6 +22,11 @@
 
 #include "Entity.h"
 
+EntityManager& GetEntityManager()
+{
+	return EntityManager::instance();
+}
+
 void EntityManager::addEntity(Entity& entity)
 {
 	entities_.emplace_back(&entity);

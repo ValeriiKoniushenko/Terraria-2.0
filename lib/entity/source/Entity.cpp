@@ -23,6 +23,7 @@
 #include "TerrariaGameMode.h"
 #include "TerrariaWorld.h"
 #include "glm/geometric.hpp"
+#include "EntityManager.h"
 
 glm::vec2 Entity::getPosition() const
 {
@@ -57,4 +58,14 @@ void Entity::update(float tick)
 	{
 		impulse_ = glm::vec2(0.f);
 	}
+}
+
+Entity::Entity()
+{
+	GetEntityManager().addEntity(*this);
+}
+
+Entity::~Entity()
+{
+	GetEntityManager().removeEntity(*this);
 }

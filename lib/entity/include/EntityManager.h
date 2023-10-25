@@ -18,12 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "NotCopyableAndNotMovable.h"
+#include "Singleton.h"
 #include <vector>
 
 class Entity;
 
-class EntityManager : public Utils::NotCopyableAndNotMovable
+class EntityManager : public Singleton<EntityManager>
 {
 public:
 	void addEntity(Entity& entity);
@@ -33,3 +33,5 @@ public:
 private:
 	std::vector<Entity*> entities_;
 };
+
+EntityManager& GetEntityManager();
