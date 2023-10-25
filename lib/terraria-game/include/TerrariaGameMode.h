@@ -88,6 +88,7 @@ public:
 	GenerationRules generationRules;
 	int textureSize = 512;
 	std::size_t animationFrameGap = 50;
+	float airResistance = 0.99;
 
 private:
 

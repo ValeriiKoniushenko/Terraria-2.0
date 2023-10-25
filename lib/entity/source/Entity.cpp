@@ -1,5 +1,3 @@
-// MIT License
-//
 // Copyright (c) 2023 Valerii Koniushenko
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,36 +18,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "Entity.h"
 
-#include "BaseGameState.h"
-#include "Camera.h"
-#include "InputAction.h"
-#include "Map.h"
-#include "ShaderPack.h"
-#include "InstancedWidget.h"
-#include "StopMotionAnimation.h"
+#include "TerrariaGameMode.h"
+#include "TerrariaWorld.h"
+#include "glm/geometric.hpp"
 
-class TerrariaGameMode;
-
-class TerrariaGameState : public BaseGameState
+glm::vec2 Entity::getPosition() const
 {
-public:
-	TerrariaGameState();
+	return position_;
+}
 
-	void initialize();
-	void tick(float tick);
+void Entity::setPosition(glm::vec2 position)
+{
+	position_ = position;
+}
 
-private:
-	TerrariaGameMode* gameMode = nullptr;
-	
-	Map map_;
-	Camera camera_;
-	KeyboardInputAction cameraRightIA_;
-	KeyboardInputAction cameraLeftIA_;
-	KeyboardInputAction cameraTopIA_;
-	KeyboardInputAction cameraBottomIA_;
-	KeyboardInputAction cameraZoomUpIA_;
-	KeyboardInputAction cameraZoomDownIA_;
-	ShaderPack shaderPack_;
-};
+glm::vec2 Entity::getImpulse() const
+{
+	return impulse_;
+}
+
+void Entity::setImpulse(glm::vec2 impulse)
+{
+	impulse_ = impulse;
+}
+
+void Entity::update(float tick)
+{
+	static auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+	if (!gameMode)
+	{
+		return;
+	}
+
+	impulse_ *= gameMode->airResistance;
+	if (glm::length(impulse_) < 0.001)
+	{
+		impulse_ = glm::vec2(0.f);
+	}
+}

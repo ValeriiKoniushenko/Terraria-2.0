@@ -74,23 +74,11 @@ void TerrariaGameState::initialize()
 	gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
 
 	map_.generate(gameMode->generationRules.countOfChuncksByX, gameMode->generationRules.countOfChuncksByY);
-
-	widget.setTexture(GetTextureManager().getTexture("netherrack"));
-	widget.setSize({512,512});
-	widget.getTransforms().emplace_back(0,0);
-	widget.getTransforms().emplace_back(1000,1000);
-	anim.setupAnimation(widget);
-	anim.setFrameGap(50);
-	anim.start();
-
-	widget1 = std::move(widget);
-	widget1.getTransforms().emplace_back(1000,1000);
 }
 
 void TerrariaGameState::tick(float tick)
 {
 	map_.drawChunckWithNeighbours(map_.getCameraPositionAtMap(camera_), map_.getNeighboursCount(camera_), shaderPack_, &camera_);
-	//widget1.draw(shaderPack_, &camera_);
 
 	camera_.setTick(tick * gameMode->tickMultiplayer);
 }

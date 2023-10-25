@@ -19,6 +19,7 @@ endif ()
 add_subdirectory(VaKon2D)
 add_subdirectory(game)
 
+add_subdirectory(lib/entity)
 add_subdirectory(lib/terraria-world)
 add_subdirectory(lib/terraria-game)
 add_subdirectory(lib/map)

@@ -1,5 +1,3 @@
-// MIT License
-//
 // Copyright (c) 2023 Valerii Koniushenko
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,36 +18,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "NotCopyableAndNotMovable.h"
+#include <vector>
 
-#include "BaseGameState.h"
-#include "Camera.h"
-#include "InputAction.h"
-#include "Map.h"
-#include "ShaderPack.h"
-#include "InstancedWidget.h"
-#include "StopMotionAnimation.h"
+class Entity;
 
-class TerrariaGameMode;
-
-class TerrariaGameState : public BaseGameState
+class EntityManager : public Utils::NotCopyableAndNotMovable
 {
 public:
-	TerrariaGameState();
-
-	void initialize();
-	void tick(float tick);
+	void addEntity(Entity& entity);
+	void removeEntity(Entity& entity);
+ 	void updateAll(float tick);
 
 private:
-	TerrariaGameMode* gameMode = nullptr;
-	
-	Map map_;
-	Camera camera_;
-	KeyboardInputAction cameraRightIA_;
-	KeyboardInputAction cameraLeftIA_;
-	KeyboardInputAction cameraTopIA_;
-	KeyboardInputAction cameraBottomIA_;
-	KeyboardInputAction cameraZoomUpIA_;
-	KeyboardInputAction cameraZoomDownIA_;
-	ShaderPack shaderPack_;
+	std::vector<Entity*> entities_;
 };

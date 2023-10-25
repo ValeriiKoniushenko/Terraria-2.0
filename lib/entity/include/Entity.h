@@ -1,5 +1,3 @@
-// MIT License
-//
 // Copyright (c) 2023 Valerii Koniushenko
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,36 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "CopyableAndMoveable.h"
+#include "glm/vec2.hpp"
 
-#include "BaseGameState.h"
-#include "Camera.h"
-#include "InputAction.h"
-#include "Map.h"
-#include "ShaderPack.h"
-#include "InstancedWidget.h"
-#include "StopMotionAnimation.h"
-
-class TerrariaGameMode;
-
-class TerrariaGameState : public BaseGameState
+class Entity : public Utils::CopyableAndMoveable
 {
 public:
-	TerrariaGameState();
+	[[nodiscard]] glm::vec2 getPosition() const;
+	void setPosition(glm::vec2 position);
 
-	void initialize();
-	void tick(float tick);
+	[[nodiscard]] glm::vec2 getImpulse() const;
+	void setImpulse(glm::vec2 impulse);
 
+	void update(float tick);
 private:
-	TerrariaGameMode* gameMode = nullptr;
-	
-	Map map_;
-	Camera camera_;
-	KeyboardInputAction cameraRightIA_;
-	KeyboardInputAction cameraLeftIA_;
-	KeyboardInputAction cameraTopIA_;
-	KeyboardInputAction cameraBottomIA_;
-	KeyboardInputAction cameraZoomUpIA_;
-	KeyboardInputAction cameraZoomDownIA_;
-	ShaderPack shaderPack_;
+	glm::vec2 position_{};
+	glm::vec2 impulse_{};
 };
