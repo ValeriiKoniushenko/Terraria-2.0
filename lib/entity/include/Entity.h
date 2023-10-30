@@ -34,6 +34,7 @@ public:
 	void setImpulse(glm::vec2 impulse);
 
 	void update(float tick);
+	
 private:
 	glm::vec2 position_{};
 	glm::vec2 impulse_{};

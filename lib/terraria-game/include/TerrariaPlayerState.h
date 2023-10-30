@@ -27,8 +27,5 @@
 class TerrariaPlayerState : public BasePlayerState
 {
 public:
-
-
 private:
-
 };

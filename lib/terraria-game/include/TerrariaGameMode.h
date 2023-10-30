@@ -25,8 +25,8 @@
 #include "BaseGameMode.h"
 
 #include <cstdlib>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 class TerrariaGameMode : public BaseGameMode
 {
@@ -51,7 +51,7 @@ public:
 
 		struct Ore
 		{
-			int density = 10; // less value - more ore
+			int density = 10;	 // less value - more ore
 			int minAmount = 10;
 			int maxAmount = 10;
 			int minSpawnHeight = 10;
@@ -66,21 +66,20 @@ public:
 		};
 
 		std::unordered_map<std::string, Ore> ores = {
-			{ "iron_ore", { 100, 4, 20, 0, 128, "iron_ore" } },
-			{ "diamond_ore", { 250, 1, 8, 48, 128, "diamond_ore" } },
-			{ "diamond_ore1", { 150, 4, 16, 128, 4096, "diamond_ore" } },
-			{ "andesite", { 70, 10, 80, 40, 4096, "andesite" } },
-			{ "gravel", { 100, 5, 30, 0, 4096, "gravel" } },
-			{ "obsidian", { 150, 4, 16, 128, 4096, "obsidian" } },
+			{"iron_ore", {100, 4, 20, 0, 128, "iron_ore"}},
+			{"diamond_ore", {250, 1, 8, 48, 128, "diamond_ore"}},
+			{"diamond_ore1", {150, 4, 16, 128, 4096, "diamond_ore"}},
+			{"andesite", {70, 10, 80, 40, 4096, "andesite"}},
+			{"gravel", {100, 5, 30, 0, 4096, "gravel"}},
+			{"obsidian", {150, 4, 16, 128, 4096, "obsidian"}},
 		};
-		std::unordered_map<std::string, Biome> biomes =
-		{
-			{ "green plain", { "green plain", 30 } },
-			{ "green hills", { "green hills", 3 } },
-			{ "green mountains", { "green mountains", 1 } },
-			{ "water", { "water", 55 } },
-			{ "space", { "space", 3 } },
-			{ "hell", { "hell", 5 } },
+		std::unordered_map<std::string, Biome> biomes = {
+			{"green plain", {"green plain", 30}},
+			{"green hills", {"green hills", 3}},
+			{"green mountains", {"green mountains", 1}},
+			{"water", {"water", 55}},
+			{"space", {"space", 3}},
+			{"hell", {"hell", 5}},
 		};
 	};
 
@@ -91,5 +90,4 @@ public:
 	float airResistance = 0.99;
 
 private:
-
 };

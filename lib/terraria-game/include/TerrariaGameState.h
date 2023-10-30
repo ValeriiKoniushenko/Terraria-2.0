@@ -25,9 +25,9 @@
 #include "BaseGameState.h"
 #include "Camera.h"
 #include "InputAction.h"
+#include "InstancedWidget.h"
 #include "Map.h"
 #include "ShaderPack.h"
-#include "InstancedWidget.h"
 #include "StopMotionAnimation.h"
 
 class TerrariaGameMode;
@@ -42,7 +42,7 @@ public:
 
 private:
 	TerrariaGameMode* gameMode = nullptr;
-	
+
 	Map map_;
 	Camera camera_;
 	KeyboardInputAction cameraRightIA_;
