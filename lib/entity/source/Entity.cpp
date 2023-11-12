@@ -27,6 +27,7 @@
 #include "InstancedWidget.h"
 #include "ShaderPack.h"
 #include "Camera.h"
+#include "Map.h"
 
 glm::vec2 Entity::getPosition() const
 {
@@ -55,6 +56,8 @@ void Entity::update(float tick)
 	{
 		return;
 	}
+
+	freeFall();
 
 	if (impulse_.x == 0.f && impulse_.y == 0.f)
 	{
@@ -107,10 +110,30 @@ void Entity::draw(ShaderPack& shaderPack, Camera* camera/* = nullptr*/)
 	static auto* gameState = dynamic_cast<TerrariaGameState*>(GetTerrariaWorld().gameState.get());
 
 	widget_.setSize({static_cast<float>(gameMode->textureSize),static_cast<float>(gameMode->textureSize)});
-	float offsetY = gameMode->generationRules.countOfChuncksByY / 2 * gameMode->textureSize * gameMode->generationRules.chunckSize;
+	const float offsetY = static_cast<float>(gameMode->generationRules.countOfChuncksByY / 2 * gameMode->textureSize * gameMode->generationRules.chunckSize);
 	auto pos = position_ + glm::vec2(0, -offsetY);
 
 	widget_.setPosition((pos));
 
 	widget_.draw(shaderPack, camera);
+}
+
+void Entity::freeFall()
+{
+	if (static auto* gameState = dynamic_cast<TerrariaGameState*>(GetTerrariaWorld().gameState.get()); gameState)
+	{
+		auto distanceToGround = calculateDistanceToGround(gameState->map_);
+	}
+}
+
+float Entity::calculateDistanceToGround(const Map& map)
+{
+	if (const std::optional<Map::Point> mapPoint = map.getMapPointFromGlobalPoint(position_); mapPoint.has_value())
+	{
+		if (static auto* gameState = dynamic_cast<TerrariaGameState*>(GetTerrariaWorld().gameState.get()); gameState)
+		{
+
+		}
+	}
+	return -1.f;
 }

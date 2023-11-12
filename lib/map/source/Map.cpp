@@ -475,3 +475,28 @@ bool Map::isInteractWithPointAt(glm::vec2 position)
 
 	return true;
 }
+
+std::optional<Map::Point> Map::getMapPointFromGlobalPoint(glm::vec2 position) const
+{
+	if (position.x < 0 || position.y < 0)
+	{
+		return {};
+	}
+
+	if (static auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get()); gameMode)
+	{
+		const glm::ivec2 globalBlockPosition = position / glm::vec2(gameMode->textureSize);
+		const glm::ivec2 chunckPosition = globalBlockPosition / glm::ivec2(gameMode->generationRules.chunckSize);
+		const glm::ivec2 localBlockPosition = globalBlockPosition % glm::ivec2(gameMode->generationRules.chunckSize);
+
+		if (chunckPosition.x < 0 || chunckPosition.y < 0 || chunckPosition.x >= gameMode->generationRules.countOfChuncksByX ||
+			chunckPosition.y >= gameMode->generationRules.countOfChuncksByY || localBlockPosition.x < 0 || localBlockPosition.y < 0)
+		{
+			return {};
+		}
+
+		return std::make_optional<Point>({chunckPosition, localBlockPosition});
+	}
+
+	return {};
+}

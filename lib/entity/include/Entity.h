@@ -27,6 +27,7 @@
 
 class ShaderPack;
 class Camera;
+class Map;
 
 class Entity : public Utils::CopyableAndMoveable
 {
@@ -44,8 +45,11 @@ public:
 
 	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
 
+	[[nodiscard]] float calculateDistanceToGround(const Map& map);
+
 protected:
 	[[nodiscard]] virtual bool isInteractWithMap(glm::vec2 position) const;
+	virtual void freeFall();
 
 protected:
 	Widget widget_;

@@ -27,6 +27,7 @@
 #include "TerrariaGameMode.h"
 
 #include <vector>
+#include <optional>
 
 class ShaderPack;
 class Texture;
@@ -37,6 +38,12 @@ public:
 	using MapT = std::vector<std::vector<Chunck>>;
 	using Biome = TerrariaGameMode::GenerationRules::Biome;
 
+	struct Point
+	{
+		glm::ivec2 chunck{};
+		glm::ivec2 block{};
+	};
+
 	void generate(long long countOfChuncksByX, long long countOfChuncksByY);
 	void drawChunck(long long x, long long y, ShaderPack& shaderPack, Camera* camera = nullptr);
 	void drawChunckWithNeighbours(glm::ivec2 position, long long radius, ShaderPack& shaderPack, Camera* camera = nullptr);
@@ -44,6 +51,7 @@ public:
 	[[nodiscard]] int getNeighboursCount(Camera& camera);
 	[[nodiscard]] bool isInteractWithBlockAt(glm::vec2 position);
 	[[nodiscard]] bool isInteractWithPointAt(glm::vec2 position);
+	[[nodiscard]] std::optional<Point> getMapPointFromGlobalPoint(glm::vec2 position) const;
 
 private:
 	void generateBiomes(long long countOfChuncksByX, long long countOfChuncksByY);
