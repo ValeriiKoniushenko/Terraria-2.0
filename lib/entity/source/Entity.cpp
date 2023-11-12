@@ -67,12 +67,20 @@ void Entity::update(float tick)
 		impulse_ = glm::vec2(0.f);
 	}
 
-	auto positionTransaction = position_;
-	positionTransaction += impulse_ * tick;
+	auto positionTransactionX = position_;
+	positionTransactionX.x += impulse_.x * tick;
 
-	if (!isInteractWithMap(positionTransaction))
+	if (!isInteractWithMap(positionTransactionX))
 	{
-		position_ = positionTransaction; // commit transaction
+		position_.x = positionTransactionX.x; // commit transaction
+	}
+
+	auto positionTransactionY = position_;
+	positionTransactionY.y += impulse_.y * tick;
+
+	if (!isInteractWithMap(positionTransactionY))
+	{
+		position_.y = positionTransactionY.y; // commit transaction
 	}
 }
 
