@@ -436,16 +436,18 @@ void Map::generateHell(long long int countOfChuncksByX, long long int countOfChu
 
 bool Map::isInteractWithBlockAt(glm::vec2 position)
 {
+	static auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
 	if (isInteractWithPointAt(position))
 		return true;
 
-	if (isInteractWithPointAt(position + glm::vec2(512, 0)))
+	if (isInteractWithPointAt(position + glm::vec2(gameMode->textureSize, 0)))
 		return true;
 
-	if (isInteractWithPointAt(position + glm::vec2(0, 512)))
+	if (isInteractWithPointAt(position + glm::vec2(0, gameMode->textureSize)))
 		return true;
 
-	if (isInteractWithPointAt(position + glm::vec2(512, 512)))
+	if (isInteractWithPointAt(position + glm::vec2(gameMode->textureSize, gameMode->textureSize)))
 		return true;
 
 	return false;
