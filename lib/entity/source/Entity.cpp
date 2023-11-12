@@ -80,7 +80,7 @@ bool Entity::isInteractWithMap(glm::vec2 position) const
 {
 	static auto* gameState = dynamic_cast<TerrariaGameState*>(GetTerrariaWorld().gameState.get());
 
-	return gameState->map_.isInteract(position, &gameState->camera_);
+	return gameState->map_.isInteractWithBlockAt(position);
 }
 
 void Entity::addImpulse(glm::vec2 impulse)

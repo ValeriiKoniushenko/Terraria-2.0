@@ -434,15 +434,26 @@ void Map::generateHell(long long int countOfChuncksByX, long long int countOfChu
 	}
 }
 
-bool Map::isInteract(glm::vec2 position, Camera* camera/* = nullptr*/)
+bool Map::isInteractWithBlockAt(glm::vec2 position)
+{
+	if (isInteractWithPointAt(position))
+		return true;
+
+	if (isInteractWithPointAt(position + glm::vec2(512, 0)))
+		return true;
+
+	if (isInteractWithPointAt(position + glm::vec2(0, 512)))
+		return true;
+
+	if (isInteractWithPointAt(position + glm::vec2(512, 512)))
+		return true;
+
+	return false;
+}
+
+bool Map::isInteractWithPointAt(glm::vec2 position)
 {
 	static auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
-	glm::ivec2 camerasPositionAtMap{};
-	if (camera)
-	{
-		camerasPositionAtMap = getCameraPositionAtMap(*camera);
-		// position = camera->toGlobalCoordinates(position);
-	}
 
 	const glm::ivec2 globalBlockPosition = position / glm::vec2(gameMode->textureSize, gameMode->textureSize);
 	const glm::ivec2 chunckPosition = globalBlockPosition / glm::ivec2(gameMode->generationRules.chunckSize);

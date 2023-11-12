@@ -42,7 +42,8 @@ public:
 	void drawChunckWithNeighbours(glm::ivec2 position, long long radius, ShaderPack& shaderPack, Camera* camera = nullptr);
 	glm::ivec2 getCameraPositionAtMap(Camera& camera);
 	[[nodiscard]] int getNeighboursCount(Camera& camera);
-	[[nodiscard]] bool isInteract(glm::vec2 position, Camera* camera = nullptr);
+	[[nodiscard]] bool isInteractWithBlockAt(glm::vec2 position);
+	[[nodiscard]] bool isInteractWithPointAt(glm::vec2 position);
 
 private:
 	void generateBiomes(long long countOfChuncksByX, long long countOfChuncksByY);
