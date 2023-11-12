@@ -432,7 +432,33 @@ void Map::generateHell(long long int countOfChuncksByX, long long int countOfChu
 			}
 		}
 	}
+}
 
+bool Map::isInteract(glm::vec2 position, Camera* camera/* = nullptr*/)
+{
+	static auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+	glm::ivec2 camerasPositionAtMap{};
+	if (camera)
+	{
+		camerasPositionAtMap = getCameraPositionAtMap(*camera);
+		// position = camera->toGlobalCoordinates(position);
+	}
 
+	const glm::ivec2 globalBlockPosition = position / glm::vec2(gameMode->textureSize, gameMode->textureSize);
+	const glm::ivec2 chunckPosition = globalBlockPosition / glm::ivec2(gameMode->generationRules.chunckSize);
+	const glm::ivec2 localBlockPosition = globalBlockPosition % glm::ivec2(gameMode->generationRules.chunckSize);
 
+	if (chunckPosition.x < 0 || chunckPosition.y < 0 || chunckPosition.x >= gameMode->generationRules.countOfChuncksByX ||
+		chunckPosition.y >= gameMode->generationRules.countOfChuncksByY || localBlockPosition.x < 0 || localBlockPosition.y < 0)
+	{
+		return true;
+	}
+
+	auto& block = map_[chunckPosition.y][chunckPosition.x][localBlockPosition.y][localBlockPosition.x];
+	if (block.getTexture()->getName() == "air")
+	{
+		return false;
+	}
+
+	return true;
 }

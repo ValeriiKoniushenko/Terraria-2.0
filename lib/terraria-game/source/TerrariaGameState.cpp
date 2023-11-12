@@ -26,6 +26,8 @@
 #include "TextureManager.h"
 #include "Window.h"
 
+#include <iostream>
+
 TerrariaGameState::TerrariaGameState()
 	: cameraRightIA_("Camera to right", Keyboard::Key::D)
 	, cameraLeftIA_("Camera to left", Keyboard::Key::A)
@@ -40,19 +42,19 @@ void TerrariaGameState::initialize()
 {
 	cameraRightIA_.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraRightIA_.setIsRepeatable(true);
-	cameraRightIA_.onAction.subscribe([this]() { camera_.move({4, 0}); });
+	cameraRightIA_.onAction.subscribe([this]() { camera_.move({4, 0}); /*livingEntity.addImpulse({400,0});*/ });
 
 	cameraLeftIA_.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraLeftIA_.setIsRepeatable(true);
-	cameraLeftIA_.onAction.subscribe([this]() { camera_.move({-4, 0}); });
+	cameraLeftIA_.onAction.subscribe([this]() { camera_.move({-4, 0}); /*livingEntity.addImpulse({-400,0});*/});
 
 	cameraTopIA_.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraTopIA_.setIsRepeatable(true);
-	cameraTopIA_.onAction.subscribe([this]() { camera_.move({0, -4}); });
+	cameraTopIA_.onAction.subscribe([this]() { camera_.move({0, -4}); /*livingEntity.addImpulse({0,-400});*/});
 
 	cameraBottomIA_.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraBottomIA_.setIsRepeatable(true);
-	cameraBottomIA_.onAction.subscribe([this]() { camera_.move({0, 4}); });
+	cameraBottomIA_.onAction.subscribe([this]() { camera_.move({0, 4}); /*livingEntity.addImpulse({0,400});*/});
 
 	cameraZoomUpIA_.setFrequency(KeyboardInputAction::TimeT(1));
 	cameraZoomUpIA_.setIsRepeatable(true);
@@ -74,6 +76,9 @@ void TerrariaGameState::initialize()
 	gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
 
 	map_.generate(gameMode->generationRules.countOfChuncksByX, gameMode->generationRules.countOfChuncksByY);
+
+	livingEntity.setPosition({512.f, 0.f});
+	livingEntity.setTexture(GetTextureManager().getTexture("player"));
 }
 
 void TerrariaGameState::tick(float tick)
@@ -81,4 +86,9 @@ void TerrariaGameState::tick(float tick)
 	map_.drawChunckWithNeighbours(map_.getCameraPositionAtMap(camera_), map_.getNeighboursCount(camera_), shaderPack_, &camera_);
 
 	camera_.setTick(tick * gameMode->tickMultiplayer);
+
+	livingEntity.draw(shaderPack_, &camera_);
+	livingEntity.update(tick);
+
+	std::cout << livingEntity.getPosition().x << " " << livingEntity.getPosition().y << std::endl;
 }

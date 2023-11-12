@@ -30,4 +30,5 @@ target_link_libraries(Game PUBLIC
 	FreeType-Wrapper
 	Animations
 	Texture-Manager
+	Entity
 	)

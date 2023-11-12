@@ -15,4 +15,6 @@ target_link_libraries(Texture-Manager PUBLIC
 	Utils
 	Core-Wrappers
 	Shapes
+	Game
+	Base-World
 )

@@ -20,39 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+
 #pragma once
 
-#include "BaseGameState.h"
-#include "Camera.h"
-#include "InputAction.h"
-#include "InstancedWidget.h"
-#include "LivingEntity.h"
-#include "Map.h"
-#include "ShaderPack.h"
-#include "StopMotionAnimation.h"
+#include "Entity.h"
 
-class TerrariaGameMode;
-
-class TerrariaGameState : public BaseGameState
+class LivingEntity : public Entity
 {
 public:
-	TerrariaGameState();
 
-	void initialize();
-	void tick(float tick);
-
-	Map map_;
-	Camera camera_;
-	LivingEntity livingEntity;
-
-private:
-	TerrariaGameMode* gameMode = nullptr;
-
-	KeyboardInputAction cameraRightIA_;
-	KeyboardInputAction cameraLeftIA_;
-	KeyboardInputAction cameraTopIA_;
-	KeyboardInputAction cameraBottomIA_;
-	KeyboardInputAction cameraZoomUpIA_;
-	KeyboardInputAction cameraZoomDownIA_;
-	ShaderPack shaderPack_;
+protected:
 };

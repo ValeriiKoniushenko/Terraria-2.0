@@ -18,24 +18,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#pragma once
+
 #include "CopyableAndMoveable.h"
+#include "Rect.h"
+#include "Widget.h"
 #include "glm/vec2.hpp"
+
+class ShaderPack;
+class Camera;
 
 class Entity : public Utils::CopyableAndMoveable
 {
 public:
-	Entity();
-	~Entity() override;
-
 	[[nodiscard]] glm::vec2 getPosition() const;
 	void setPosition(glm::vec2 position);
 
 	[[nodiscard]] glm::vec2 getImpulse() const;
 	void setImpulse(glm::vec2 impulse);
+	void addImpulse(glm::vec2 impulse);
 
 	void update(float tick);
-	
-private:
+
+	void setTexture(Texture& texture);
+
+	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
+
+protected:
+	[[nodiscard]] virtual bool isInteractWithMap(glm::vec2 position) const;
+
+protected:
+	Widget widget_;
 	glm::vec2 position_{};
 	glm::vec2 impulse_{};
+	Utils::FRect rect_;
 };

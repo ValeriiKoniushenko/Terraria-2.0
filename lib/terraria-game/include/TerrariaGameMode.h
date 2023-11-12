@@ -36,9 +36,9 @@ public:
 		int chunckSize = 16;
 		int chunckSmoothness = 3;
 		int dirtHeight = 10;
-		int height = 4096;
+		int height = 96;
 		int countOfChuncksByY = height / chunckSize;
-		int countOfChuncksByX = 128;
+		int countOfChuncksByX = 16;
 		int maxSizeOfRandomBiomes = 10;
 		int minSizeOfRandomBiomes = 5;
 		int caveChance = 2000;

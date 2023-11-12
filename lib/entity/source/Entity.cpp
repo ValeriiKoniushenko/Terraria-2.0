@@ -23,7 +23,10 @@
 #include "TerrariaGameMode.h"
 #include "TerrariaWorld.h"
 #include "glm/geometric.hpp"
-#include "EntityManager.h"
+#include "TerrariaGameState.h"
+#include "InstancedWidget.h"
+#include "ShaderPack.h"
+#include "Camera.h"
 
 glm::vec2 Entity::getPosition() const
 {
@@ -53,19 +56,53 @@ void Entity::update(float tick)
 		return;
 	}
 
+	if (impulse_.x == 0.f && impulse_.y == 0.f)
+	{
+		return;
+	}
+
 	impulse_ *= gameMode->airResistance;
 	if (glm::length(impulse_) < 0.001)
 	{
 		impulse_ = glm::vec2(0.f);
 	}
+
+	auto positionTransaction = position_;
+	positionTransaction += impulse_ * tick;
+
+	if (!isInteractWithMap(positionTransaction))
+	{
+		position_ = positionTransaction; // commit transaction
+	}
 }
 
-Entity::Entity()
+bool Entity::isInteractWithMap(glm::vec2 position) const
 {
-	GetEntityManager().addEntity(*this);
+	static auto* gameState = dynamic_cast<TerrariaGameState*>(GetTerrariaWorld().gameState.get());
+
+	return gameState->map_.isInteract(position, &gameState->camera_);
 }
 
-Entity::~Entity()
+void Entity::addImpulse(glm::vec2 impulse)
 {
-	GetEntityManager().removeEntity(*this);
+	setImpulse(impulse + impulse_);
+}
+
+void Entity::setTexture(Texture& texture)
+{
+	widget_.setTexture(texture);
+}
+
+void Entity::draw(ShaderPack& shaderPack, Camera* camera/* = nullptr*/)
+{
+	static auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+	static auto* gameState = dynamic_cast<TerrariaGameState*>(GetTerrariaWorld().gameState.get());
+
+	widget_.setSize({static_cast<float>(gameMode->textureSize),static_cast<float>(gameMode->textureSize)});
+	float offsetY = gameMode->generationRules.countOfChuncksByY / 2 * gameMode->textureSize * gameMode->generationRules.chunckSize;
+	auto pos = position_ + glm::vec2(0, -offsetY);
+
+	widget_.setPosition((pos));
+
+	widget_.draw(shaderPack, camera);
 }

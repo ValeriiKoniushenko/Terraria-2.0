@@ -22,6 +22,9 @@
 
 #include "TextureManager.h"
 
+#include "TerrariaGameMode.h"
+#include "TerrariaWorld.h"
+
 #include <filesystem>
 
 TextureManager& GetTextureManager()
@@ -33,22 +36,27 @@ void TextureManager::loadAllTextures()
 {
 	using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 
-	for (const auto& dirEntry : recursive_directory_iterator("assets/textures/block"))
+	static auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get());
+
+	for (const auto& dirEntry : recursive_directory_iterator("assets/textures/"))
 	{
-		Image image;
-		image.loadImage(dirEntry.path().string());
-		image.setInternalChannel(Gl::Texture::Channel::RGBA);
-		images_.emplace(dirEntry.path().stem().string(), std::move(image));
+		if (!std::filesystem::is_directory(dirEntry))
+		{
+			Image image;
+			image.loadImage(dirEntry.path().string());
+			image.setInternalChannel(Gl::Texture::Channel::RGBA);
+			images_.emplace(dirEntry.path().stem().string(), std::move(image));
 
-		Texture texture(Gl::Texture::Target::Texture2D, true, true);
-		texture.setImage(images_[dirEntry.path().stem().string()]);
-		texture.setMagAndMinFilter(Gl::Texture::MagFilter::Linear, Gl::Texture::MinFilter::LinearMipmapLinear);
-		textures_.emplace(dirEntry.path().stem().string(), std::move(texture));
+			Texture texture(Gl::Texture::Target::Texture2D, true, true);
+			texture.setImage(images_[dirEntry.path().stem().string()]);
+			texture.setMagAndMinFilter(Gl::Texture::MagFilter::Linear, Gl::Texture::MinFilter::LinearMipmapLinear);
+			textures_.emplace(dirEntry.path().stem().string(), std::move(texture));
 
-		InstancedWidget widget;
-		widget.setTexture(textures_[dirEntry.path().stem().string()]);
-		widget.setSize({512, 512});
-		widgets_.emplace(dirEntry.path().stem().string(), std::move(widget));
+			InstancedWidget widget;
+			widget.setTexture(textures_[dirEntry.path().stem().string()]);
+			widget.setSize({static_cast<float>(gameMode->textureSize), static_cast<float>(gameMode->textureSize)});
+			widgets_.emplace(dirEntry.path().stem().string(), std::move(widget));
+		}
 	}
 }
 
