@@ -38,6 +38,14 @@ public:
 	using MapT = std::vector<std::vector<Chunck>>;
 	using Biome = TerrariaGameMode::GenerationRules::Biome;
 
+	enum class Direction
+	{
+		Up,
+		Down,
+		Left,
+		Right
+	};
+
 	struct Point
 	{
 		glm::ivec2 chunck{};
@@ -52,6 +60,9 @@ public:
 	[[nodiscard]] bool isInteractWithBlockAt(glm::vec2 position);
 	[[nodiscard]] bool isInteractWithPointAt(glm::vec2 position);
 	[[nodiscard]] std::optional<Point> getMapPointFromGlobalPoint(glm::vec2 position) const;
+	[[nodiscard]] Block& getBlock(Point point);
+	[[nodiscard]] const Block& getBlock(Point point) const;
+	[[nodiscard]] float getDistanceToNeighbourBlock(glm::vec2 position, Direction direction);
 
 private:
 	void generateBiomes(long long countOfChuncksByX, long long countOfChuncksByY);

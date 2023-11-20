@@ -24,10 +24,13 @@
 #include "Rect.h"
 #include "Widget.h"
 #include "glm/vec2.hpp"
+#include "Delegate.h"
+#include "Map.h"
+
+#include <chrono>
 
 class ShaderPack;
 class Camera;
-class Map;
 
 class Entity : public Utils::CopyableAndMoveable
 {
@@ -45,15 +48,25 @@ public:
 
 	void draw(ShaderPack& shaderPack, Camera* camera = nullptr);
 
-	[[nodiscard]] float calculateDistanceToGround(const Map& map);
+	[[nodiscard]] float calculateDistanceToGround(const Map& map) const;
+	[[nodiscard]] bool isGroundBelow(const Map& map) const;
+
+public: // Delegates
+	LambdaMulticastDelegate<void()> startFalling;
+	LambdaMulticastDelegate<void()> endFalling;
 
 protected:
 	[[nodiscard]] virtual bool isInteractWithMap(glm::vec2 position) const;
-	virtual void freeFall();
+	[[nodiscard]] virtual float getDistanceToNeighbourBlock(glm::vec2 position, Map::Direction direction) const;
+	virtual void updateFreeFall(float tick);
+	virtual void updateImpulse(float tick);
 
 protected:
 	Widget widget_;
 	glm::vec2 position_{};
 	glm::vec2 impulse_{};
 	Utils::FRect rect_;
+	bool isFalling_ = false;
+	bool isFallingInit_ = false;
+	std::chrono::system_clock::time_point fallWasStartedAt_ = std::chrono::system_clock::now();
 };

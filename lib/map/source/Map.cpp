@@ -500,3 +500,70 @@ std::optional<Map::Point> Map::getMapPointFromGlobalPoint(glm::vec2 position) co
 
 	return {};
 }
+
+Block& Map::getBlock(Map::Point point)
+{
+	return map_[point.chunck.y][point.chunck.x][point.block.y][point.block.x];
+}
+
+const Block& Map::getBlock(Map::Point point) const
+{
+	return map_[point.chunck.y][point.chunck.x][point.block.y][point.block.x];
+}
+
+float Map::getDistanceToNeighbourBlock(glm::vec2 position, Map::Direction direction)
+{
+	if (static auto* gameMode = dynamic_cast<TerrariaGameMode*>(GetTerrariaWorld().gameMode.get()); gameMode)
+	{
+		if (direction == Direction::Down)
+		{
+			glm::vec2 neighbourBlock = glm::ivec2(position.x, position.y + gameMode->textureSize);
+			if (auto point = getMapPointFromGlobalPoint(neighbourBlock); point.has_value())
+			{
+				const float neighbourPoint = point->chunck.y * gameMode->generationRules.chunckSize * gameMode->textureSize +
+											 point->block.y * gameMode->textureSize;
+				return neighbourPoint - position.y;
+			}
+
+			return 0.f;
+		}
+		if (direction == Direction::Up)
+		{
+			glm::vec2 neighbourBlock = glm::vec2(position.x, position.y - 1);
+			if (auto point = getMapPointFromGlobalPoint(neighbourBlock); point.has_value())
+			{
+				const float neighbourPoint = point->chunck.y * gameMode->generationRules.chunckSize * gameMode->textureSize +
+											 point->block.y * gameMode->textureSize;
+				return position.y - neighbourPoint;
+			}
+
+			return 0.f;
+		}
+		if (direction == Direction::Right)
+		{
+			glm::vec2 neighbourBlock = glm::vec2(position.x + gameMode->textureSize, position.y);
+			if (auto point = getMapPointFromGlobalPoint(neighbourBlock); point.has_value())
+			{
+				const float neighbourPoint = point->chunck.x * gameMode->generationRules.chunckSize * gameMode->textureSize +
+											 point->block.x * gameMode->textureSize;
+				return neighbourPoint - position.x;
+			}
+
+			return 0.f;
+		}
+		if (direction == Direction::Left)
+		{
+			glm::vec2 neighbourBlock = glm::vec2(position.x - 1, position.y);
+			if (auto point = getMapPointFromGlobalPoint(neighbourBlock); point.has_value())
+			{
+				const float neighbourPoint = point->chunck.x * gameMode->generationRules.chunckSize * gameMode->textureSize +
+											 point->block.x * gameMode->textureSize;
+				return position.x - neighbourPoint;
+			}
+
+			return 0.f;
+		}
+	}
+
+	return 0.f;
+}

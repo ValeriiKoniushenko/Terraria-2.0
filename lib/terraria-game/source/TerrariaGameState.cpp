@@ -79,6 +79,8 @@ void TerrariaGameState::initialize()
 
 	livingEntity.setPosition({512.f, 0.f});
 	livingEntity.setTexture(GetTextureManager().getTexture("player"));
+	livingEntity.startFalling.subscribe([](){ std::cout << "Start fall" << std::endl; });
+	livingEntity.endFalling.subscribe([](){ std::cout << "End fall" << std::endl; });
 }
 
 void TerrariaGameState::tick(float tick)

@@ -209,3 +209,8 @@ void Chunck::setBlockAt(int x, int y, const std::string& texture, bool isAnimati
 {
 	blocks_[y][x].setTexture(getTexture(texture, isAnimation));
 }
+
+std::vector<Block>& Chunck::operator[](int y)
+{
+	return blocks_.at(y);
+}

@@ -44,6 +44,7 @@ public:
 	void calculateInstanceData(long long int xOffset, long long int yOffset);
 	void setBlockAt(int x, int y, const std::string& texture, bool isAnimation = false);
 	const std::vector<Block>& operator[](int y) const;
+	std::vector<Block>& operator[](int y);
 
 public:
 	bool caveCanBeGenerated = false;
